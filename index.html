@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#22362C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mailakirja">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Mailakirja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EAE3;
+  --panel:#F6F8F3;
+  --ink:#17211C;
+  --pine:#22362C;
+  --muted:#66756B;
+  --rule:#C9D2C5;
+  --signal:#E4A300;
+  --cool:#4A6E86;
+  --disp:'Barlow Condensed','Helvetica Neue Condensed','Arial Narrow',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:15px;line-height:1.4;
+  padding-bottom:calc(48px + env(safe-area-inset-bottom));
+}
+.wrap{max-width:520px;margin:0 auto}
+.eyebrow{
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.16em;
+  font-size:12px;font-weight:600;color:var(--muted)
+}
+
+/* ---------- header / calibration meter ---------- */
+html{background:var(--pine)}
+.head{background:var(--pine);color:#EAF0E9;position:relative;padding:calc(14px + env(safe-area-inset-top)) 16px 16px}
+.head-top{display:flex;justify-content:space-between;align-items:baseline}
+.head-top .eyebrow{color:#8FA697}
+.brand{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.factor{display:flex;align-items:flex-end;gap:10px;margin-top:8px}
+.factor-num{font-family:var(--disp);font-size:60px;line-height:.82;font-weight:700;font-variant-numeric:tabular-nums}
+.factor-lab{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:#8FA697;padding-bottom:6px}
+.meter{margin-top:12px;height:4px;background:rgba(255,255,255,.14);position:relative;border-radius:2px}
+.meter-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:rgba(255,255,255,.4)}
+.meter-fill{position:absolute;top:0;bottom:0;background:var(--signal);border-radius:2px;transition:left .35s ease,width .35s ease}
+.meter-scale{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);font-size:10px;color:#7D9488}
+.cond-line{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  font-family:var(--mono);font-size:12px;padding:5px 9px;border-radius:999px;
+  background:rgba(255,255,255,.09);color:#DCE6DB;border:0;cursor:pointer
+}
+.chip:hover{background:rgba(255,255,255,.16)}
+
+/* ---------- panels ---------- */
+.panel{background:var(--panel);border-bottom:1px solid var(--rule);padding:14px 16px}
+.panel h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 10px}
+.hidden{display:none}
+
+.ctrl{margin-bottom:14px}
+.ctrl:last-child{margin-bottom:0}
+.ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.ctrl-name{font-size:14px}
+.ctrl-val{font-family:var(--mono);font-size:15px;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--pine);height:26px}
+
+.row-2{display:flex;gap:8px}
+.row-2>*{flex:1;min-width:0}
+label.field{display:block}
+label.field span{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+input[type=number],input[type=text],select{
+  width:100%;padding:9px 10px;border:1px solid var(--rule);background:#fff;
+  border-radius:6px;font-family:var(--mono);font-size:16px;color:var(--ink)
+}
+select{font-family:var(--body);font-size:15px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+
+button.act{
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-size:14px;
+  padding:11px 14px;border:0;border-radius:6px;background:var(--pine);color:#fff;cursor:pointer
+}
+button.act.ghost{background:transparent;color:var(--pine);border:1px solid var(--rule)}
+button.act.sig{background:var(--signal);color:#241C00}
+button.act:active{transform:translateY(1px)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+/* ---------- swing tabs ---------- */
+.tabs{display:flex;background:var(--paper);border-bottom:1px solid var(--rule)}
+.tab{
+  flex:1;padding:12px 4px;border:0;background:transparent;cursor:pointer;
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.12em;font-size:13px;font-weight:600;
+  color:var(--muted);border-bottom:3px solid transparent
+}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--signal)}
+
+/* ---------- matrix ---------- */
+.matrix{padding:0 0 4px}
+.mrow{
+  display:grid;grid-template-columns:1fr 78px 78px;align-items:center;
+  padding:9px 16px;border-bottom:1px solid var(--rule)
+}
+.mrow.head-row{border-bottom:1px solid var(--ink);padding-top:12px;padding-bottom:6px;position:sticky;top:0;background:var(--paper);z-index:2}
+.mrow.head-row div{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--muted)}
+.mrow .num,.mrow .head-row div:not(:first-child){text-align:right}
+.club{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:.02em}
+.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num b{font-size:20px;font-weight:500;letter-spacing:-.02em}
+.num small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.num.total b{color:var(--muted);font-weight:400}
+.mrow input.cell{padding:6px 6px;text-align:right;font-size:15px}
+.mrow .flags{grid-column:1/-1;display:flex;gap:6px;margin-top:6px}
+.flag{
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;
+  padding:6px 10px;border-radius:999px;border:1px solid var(--rule);background:#fff;color:var(--muted);cursor:pointer
+}
+.flag[aria-pressed="true"]{background:var(--pine);border-color:var(--pine);color:#EAF0E9}
+.flag.unc[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:#241C00}
+.tags{font-family:var(--disp);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--muted);margin-top:1px}
+.tags .u{color:#9A7400}
+.num.soft b{font-weight:400;border-bottom:1px dotted var(--rule)}
+.mrow .name-in{font-family:var(--body);font-size:15px;text-align:left}
+.del{border:0;background:transparent;color:#A5443B;font-size:18px;cursor:pointer;padding:4px 8px}
+
+/* ---------- finder ---------- */
+.find-res{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.find-item{
+  display:flex;justify-content:space-between;align-items:baseline;
+  background:#fff;border:1px solid var(--rule);border-radius:6px;padding:9px 11px
+}
+.find-item .fi-club{font-family:var(--disp);font-size:17px;font-weight:600}
+.find-item .fi-sw{font-size:12px;color:var(--muted);margin-left:7px;font-family:var(--body)}
+.find-item .fi-d{font-family:var(--mono);font-size:15px}
+.find-item .fi-off{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px}
+.find-item.best{border-color:var(--signal);box-shadow:inset 3px 0 0 var(--signal)}
+
+.foot{padding:16px;display:flex;gap:8px;flex-wrap:wrap}
+.foot .sp{flex:1}
+.note{padding:0 16px 24px;font-size:12px;color:var(--muted);line-height:1.5}
+.saved{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 16px 8px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <div class="head-top">
+      <div class="brand">Mailakirja</div>
+      <div class="eyebrow" id="swingLabel">Täysi lyönti</div>
+    </div>
+
+    <div class="factor">
+      <div class="factor-num" id="factorNum">100 %</div>
+      <div class="factor-lab">kantamasta<br>tänään</div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-zero"></div>
+      <div class="meter-fill" id="meterFill"></div>
+    </div>
+    <div class="meter-scale"><span>−15 %</span><span>perus</span><span>+15 %</span></div>
+
+    <div class="cond-line">
+      <button class="chip" id="chipCond">🌡 <span id="chipCondTxt">15 °C · 0 m</span></button>
+      <button class="chip" id="chipCal">🎯 <span id="chipCalTxt">Kalibroi</span></button>
+    </div>
+  </header>
+
+  <!-- Olosuhteet -->
+  <section class="panel hidden" id="panelCond">
+    <h2>Olosuhteet tänään</h2>
+
+    <div class="ctrl">
+      <div class="ctrl-head"><span class="ctrl-name">Lämpötila</span><span class="ctrl-val" id="tempVal">15 °C</span></div>
+      <input type="range" id="temp" min="-10" max="40" step="1" value="15">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-head"><span class="ctrl-name">Korkeus merenpinnasta</span><span class="ctrl-val" id="altVal">0 m</span></div>
+      <input type="range" id="alt" min="0" max="2500" step="25" value="0">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-head"><span class="ctrl-name">Päivän kunto</span><span class="ctrl-val" id="formVal">±0 %</span></div>
+      <input type="range" id="form" min="-15" max="15" step="0.5" value="0">
+    </div>
+
+    <h2 style="margin-top:18px">Perusarvojen olosuhteet</h2>
+    <div class="row-2">
+      <label class="field"><span>Lämpötila °C</span><input type="number" id="baseTemp" value="15" step="1"></label>
+      <label class="field"><span>Korkeus m</span><input type="number" id="baseAlt" value="0" step="10"></label>
+    </div>
+    <p class="hint">Nämä ovat olosuhteet, joissa taulukon perusmetrit on mitattu. Kaikki muutokset lasketaan suhteessa näihin.</p>
+    <div class="foot" style="padding:14px 0 0">
+      <button class="act ghost" id="resetDay">Nollaa päivä</button>
+    </div>
+  </section>
+
+  <!-- Kalibrointi -->
+  <section class="panel hidden" id="panelCal">
+    <h2>Kalibroi yhdellä lyönnillä</h2>
+    <div class="row-2">
+      <label class="field"><span>Maila</span><select id="calClub"></select></label>
+      <label class="field"><span>Lyönti</span><select id="calSwing">
+        <option value="full">Täysi</option><option value="three">3/4</option><option value="half">Puolikas</option>
+      </select></label>
+    </div>
+    <div class="row-2" style="margin-top:8px">
+      <label class="field"><span>Löin (m)</span><input type="number" id="calHit" inputmode="decimal" placeholder="128"></label>
+      <label class="field"><span>Mitta</span><select id="calType">
+        <option value="total">Kokonaismatka</option><option value="carry">Carry</option>
+      </select></label>
+    </div>
+    <div class="foot" style="padding:12px 0 0">
+      <button class="act sig" id="calApply">Kalibroi kaikki</button>
+      <div class="sp"></div>
+      <button class="act ghost" id="calClear">Poista kalibrointi</button>
+    </div>
+    <p class="hint" id="calHint">Lyö referenssilyönti, syötä mitattu matka — koko taulukko skaalautuu samassa suhteessa. Lämpötila ja korkeus on jo huomioitu, joten jäljelle jää päivän kunto.</p>
+  </section>
+
+  <!-- Swing tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-sw="full" aria-selected="true">Täysi</button>
+    <button class="tab" role="tab" data-sw="three" aria-selected="false">3/4</button>
+    <button class="tab" role="tab" data-sw="half" aria-selected="false">Puolikas</button>
+  </div>
+
+  <div class="matrix" id="matrix"></div>
+
+  <div class="foot">
+    <button class="act ghost" id="editBtn">Muokkaa perusarvoja</button>
+    <button class="act ghost hidden" id="addBtn">+ Maila</button>
+  </div>
+
+  <!-- Mailahaku -->
+  <section class="panel">
+    <h2>Mikä maila?</h2>
+    <div class="row-2">
+      <label class="field"><span>Matka lippuun (m)</span><input type="number" id="findDist" inputmode="decimal" placeholder="137"></label>
+      <label class="field"><span>Peruste</span><select id="findType">
+        <option value="carry">Carry (vesi/bunkkeri yli)</option>
+        <option value="total">Kokonaismatka</option>
+      </select></label>
+    </div>
+    <div class="find-res" id="findRes"></div>
+  </section>
+
+  <div class="saved" id="saved"></div>
+  <p class="note">
+    Ilmanpaine ja lämpötila muuttavat ilman tiheyttä; laskenta käyttää standardi-ilmakehää ja kertoo tiheysmuutoksen kantamavaikutuskertoimella 0,65 (≈ +2 % / 300 m, ≈ +2 % / 10 °C). Rullaus pidetään metreissä vakiona, eli olosuhteet vaikuttavat vain carryyn.
+    Lukittu maila jää päivän kunnon kertoimen ulkopuolelle mutta saa silti sää- ja korkeuskorjauksen.
+    Epävarma maila näkyy taulukossa vaaleampana ja häviää mailahaussa varmalle vaihtoehdolle, jos ero on alle 2,5 m. Kaikki arvot tallentuvat laitteelle.
+  </p>
+</div>
+
+<script>
+const K = 0.65;              // tiheysmuutoksen vaikutus kantamaan
+const SW = {full:'Täysi lyönti', three:'3/4 lyönti', half:'Puolikas lyönti'};
+const SWSHORT = {full:'täysi', three:'3/4', half:'½'};
+const UNC_PENALTY = 2.5;   // metriä: epävarman mailan sakko mailahaussa
+const STORE_KEY = 'mailakirja:v2';
+
+/* Toimii sekä Clauden artifact-ympäristössä (window.storage) että
+   itse hostattuna verkkosovelluksena (localStorage). */
+const store = {
+  async get(k){
+    if (window.storage && window.storage.get) {
+      try { const r = await window.storage.get(k); if (r && r.value) return r.value; } catch(e){}
+    }
+    try { return localStorage.getItem(k); } catch(e){ return null; }
+  },
+  async set(k, v){
+    if (window.storage && window.storage.set) {
+      try { await window.storage.set(k, v); return true; } catch(e){}
+    }
+    try { localStorage.setItem(k, v); return true; } catch(e){ return false; }
+  }
+};
+
+// [nimi, carry, total] — totalit Harrin bägistä, carry = total − arvioitu rullaus
+const DEFAULT_BAG = [
+  ['Driver',203,225],['Puu 3',187,203],['Hybridi 5',178,191],
+  ['i4',161,172],['i5',152,161],['i6',146,154],['i7',134,141],['i8',131,137],['i9',119,124],
+  ['PW 41°',104,108],['48°',92,95],
+  // halpiswedget: lukittu kalibroinnilta ja merkitty epävarmaksi
+  ['SW 56°',80,82,true,true],['53°',72,74,true,true],['60°',61,63]
+];
+
+let uidN = 0;
+const uid = () => 'c' + (++uidN) + Date.now().toString(36);
+
+function makeClub(name, c, t, lock, unc){
+  const r = t - c;
+  return {
+    id: uid(), name, lock: !!lock, unc: !!unc,
+    full:  {c: c,                 t: t},
+    three: {c: Math.round(c*0.82), t: Math.round(c*0.82 + r*0.85)},
+    half:  {c: Math.round(c*0.58), t: Math.round(c*0.58 + r*0.70)}
+  };
+}
+
+let state = {
+  clubs: DEFAULT_BAG.map(d => makeClub(d[0], d[1], d[2], d[3], d[4])),
+  cond: {temp:15, alt:0, form:0},
+  base: {temp:15, alt:0},
+  swing: 'full',
+  edit: false
+};
+
+/* ---------- fysiikka ---------- */
+const pressureRatio = a => Math.pow(1 - 2.25577e-5 * a, 5.25588);
+
+function densityRatio(){
+  const p = pressureRatio(state.cond.alt) / pressureRatio(state.base.alt);
+  const t = (state.base.temp + 273.15) / (state.cond.temp + 273.15);
+  return p * t;                       // tiheys suhteessa perusolosuhteisiin
+}
+const envFactor  = () => 1 + K * (1 - densityRatio());
+const formFactor = () => 1 + state.cond.form / 100;
+const totalFactor = () => envFactor() * formFactor();
+
+// Lukittu maila saa vain sää- ja korkeuskorjauksen, ei päivän kunnon kerrointa:
+// wedgen matka riippuu spinistä ja greenin kovuudesta, ei siitä miten rauta lentää tänään.
+const factorFor = club => envFactor() * (club.lock ? 1 : formFactor());
+
+function adjusted(club, sw){
+  const b = club[sw];
+  const roll = b.t - b.c;
+  const c = b.c * factorFor(club);
+  return {c: Math.round(c), t: Math.round(c + roll), bc: b.c, bt: b.t, f: factorFor(club)};
+}
+
+/* ---------- tallennus ---------- */
+let saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const ok = await store.set(STORE_KEY, JSON.stringify({
+      clubs: state.clubs, cond: state.cond, base: state.base, swing: state.swing
+    }));
+    stamp(ok
+      ? 'Tallennettu ' + new Date().toLocaleTimeString('fi-FI', {hour:'2-digit',minute:'2-digit'})
+      : 'Tallennus ei onnistunut — arvot säilyvät vain tämän istunnon ajan.');
+  }, 400);
+}
+function stamp(t){ document.getElementById('saved').textContent = t; }
+
+async function load(){
+  try{
+    const raw = await store.get(STORE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      if(d.clubs && d.clubs.length){
+        state.clubs = d.clubs.map(c => { c.lock = !!c.lock; c.unc = !!c.unc; return c; });
+      }
+      if(d.cond) state.cond = Object.assign(state.cond, d.cond);
+      if(d.base) state.base = Object.assign(state.base, d.base);
+      if(d.swing) state.swing = d.swing;
+      stamp('Aiemmat arvot ladattu.');
+    }
+  }catch(e){ /* ensimmäinen käynnistys */ }
+}
+
+/* ---------- renderöinti ---------- */
+const $ = id => document.getElementById(id);
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderHeader(){
+  const f = totalFactor();
+  const pct = (f - 1) * 100;
+  $('factorNum').textContent = (f*100).toFixed(1).replace('.', ',') + ' %';
+  const clamped = Math.max(-15, Math.min(15, pct));
+  const fill = $('meterFill');
+  const half = 50;
+  if(clamped >= 0){ fill.style.left = half + '%'; fill.style.width = (clamped/15*half) + '%'; }
+  else { fill.style.left = (half + clamped/15*half) + '%'; fill.style.width = (-clamped/15*half) + '%'; }
+  $('swingLabel').textContent = SW[state.swing];
+  $('chipCondTxt').textContent = state.cond.temp + ' °C · ' + state.cond.alt + ' m';
+  const ff = (formFactor()-1)*100;
+  $('chipCalTxt').textContent = Math.abs(ff) < 0.05 ? 'Kalibroi' : 'Kunto ' + (ff>0?'+':'−') + Math.abs(ff).toFixed(1).replace('.',',') + ' %';
+  $('tempVal').textContent = state.cond.temp + ' °C';
+  $('altVal').textContent = state.cond.alt + ' m';
+  $('formVal').textContent = (ff>=0?'+':'−') + Math.abs(ff).toFixed(1).replace('.',',') + ' %';
+}
+
+function renderMatrix(){
+  const m = $('matrix');
+  m.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'mrow head-row';
+  head.innerHTML = '<div>Maila</div><div>Carry</div><div>Total</div>';
+  m.appendChild(head);
+
+  state.clubs.forEach((club, i) => {
+    const row = document.createElement('div');
+    row.className = 'mrow';
+    if(state.edit){
+      row.style.gridTemplateColumns = '1fr 66px 66px 34px';
+      const b = club[state.swing];
+      row.innerHTML =
+        '<input class="cell name-in" type="text" value="'+club.name.replace(/"/g,'&quot;')+'" data-i="'+i+'" data-f="name">' +
+        '<input class="cell" type="number" inputmode="numeric" value="'+b.c+'" data-i="'+i+'" data-f="c">' +
+        '<input class="cell" type="number" inputmode="numeric" value="'+b.t+'" data-i="'+i+'" data-f="t">' +
+        '<button class="del" data-del="'+i+'" aria-label="Poista maila">×</button>' +
+        '<div class="flags">' +
+          '<button class="flag" data-tog="lock" data-i="'+i+'" aria-pressed="'+(club.lock?'true':'false')+'">Lukittu</button>' +
+          '<button class="flag unc" data-tog="unc" data-i="'+i+'" aria-pressed="'+(club.unc?'true':'false')+'">Epävarma</button>' +
+        '</div>';
+    }else{
+      const a = adjusted(club, state.swing);
+      const changed = Math.abs(a.f - 1) > 0.002;
+      const tags = [];
+      if(club.lock) tags.push('lukittu');
+      if(club.unc)  tags.push('<span class="u">epävarma</span>');
+      const soft = club.unc ? ' soft' : '';
+      row.innerHTML =
+        '<div><div class="club">'+club.name+'</div>' +
+          (tags.length ? '<div class="tags">'+tags.join(' · ')+'</div>' : '') + '</div>' +
+        '<div class="num'+soft+'"><b>'+a.c+'</b>'+(changed?'<small>'+a.bc+'</small>':'')+'</div>' +
+        '<div class="num total'+soft+'"><b>'+a.t+'</b>'+(changed?'<small>'+a.bt+'</small>':'')+'</div>';
+    }
+    m.appendChild(row);
+  });
+}
+
+function renderCalClubs(){
+  const sel = $('calClub');
+  const cur = sel.value;
+  const usable = state.clubs.filter(c => !c.lock);
+  sel.innerHTML = usable.length
+    ? usable.map(c => '<option value="'+c.id+'">'+c.name+'</option>').join('')
+    : '<option value="">Ei kalibroitavia mailoja</option>';
+  if(usable.some(c => c.id === cur)) sel.value = cur;
+}
+
+function renderFinder(){
+  const box = $('findRes');
+  const d = parseFloat($('findDist').value);
+  if(!d || d <= 0){ box.innerHTML = ''; return; }
+  const type = $('findType').value;
+  const opts = [];
+  state.clubs.forEach(c => {
+    ['full','three','half'].forEach(sw => {
+      const a = adjusted(c, sw);
+      const v = type === 'carry' ? a.c : a.t;
+      // epävarma maila häviää yhtä lähellä olevalle varmalle
+      opts.push({name:c.name, sw, v, off: v - d, unc: c.unc, rank: Math.abs(v - d) + (c.unc ? UNC_PENALTY : 0)});
+    });
+  });
+  opts.sort((x,y) => x.rank - y.rank);
+  box.innerHTML = opts.slice(0,3).map((o,i) =>
+    '<div class="find-item'+(i===0?' best':'')+'">' +
+      '<div><span class="fi-club">'+o.name+'</span><span class="fi-sw">'+SWSHORT[o.sw] +
+        (o.unc ? ' · epävarma' : '')+'</span></div>' +
+      '<div><span class="fi-d">'+o.v+' m</span><span class="fi-off">'+(o.off>=0?'+':'−')+Math.abs(o.off)+'</span></div>' +
+    '</div>').join('');
+}
+
+function render(){ renderHeader(); renderMatrix(); renderFinder(); }
+
+/* ---------- tapahtumat ---------- */
+$('chipCond').onclick = () => { $('panelCond').classList.toggle('hidden'); $('panelCal').classList.add('hidden'); };
+$('chipCal').onclick  = () => { $('panelCal').classList.toggle('hidden'); $('panelCond').classList.add('hidden'); renderCalClubs(); };
+
+['temp','alt','form'].forEach(id => {
+  $(id).oninput = e => {
+    state.cond[id === 'temp' ? 'temp' : id === 'alt' ? 'alt' : 'form'] = parseFloat(e.target.value);
+    render(); save();
+  };
+});
+$('baseTemp').oninput = e => { state.base.temp = parseFloat(e.target.value)||0; render(); save(); };
+$('baseAlt').oninput  = e => { state.base.alt  = parseFloat(e.target.value)||0; render(); save(); };
+
+$('resetDay').onclick = () => {
+  state.cond = {temp: state.base.temp, alt: state.base.alt, form: 0};
+  syncInputs(); render(); save();
+};
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    state.swing = t.dataset.sw;
+    document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+    render(); save();
+  };
+});
+
+$('editBtn').onclick = () => {
+  state.edit = !state.edit;
+  $('editBtn').textContent = state.edit ? 'Valmis' : 'Muokkaa perusarvoja';
+  $('editBtn').classList.toggle('sig', state.edit);
+  $('addBtn').classList.toggle('hidden', !state.edit);
+  render();
+};
+$('addBtn').onclick = () => { state.clubs.push(makeClub('Uusi maila', 100, 106)); renderCalClubs(); render(); save(); };
+
+$('matrix').addEventListener('input', e => {
+  const el = e.target;
+  if(!el.dataset.f) return;
+  const c = state.clubs[+el.dataset.i];
+  if(el.dataset.f === 'name'){ c.name = el.value; renderCalClubs(); }
+  else { c[state.swing][el.dataset.f] = parseFloat(el.value) || 0; }
+  renderHeader(); renderFinder(); save();
+});
+$('matrix').addEventListener('click', e => {
+  const tog = e.target.dataset.tog;
+  if(tog){
+    const c = state.clubs[+e.target.dataset.i];
+    c[tog] = !c[tog];
+    e.target.setAttribute('aria-pressed', c[tog] ? 'true' : 'false');
+    renderCalClubs(); renderFinder(); save();
+    return;
+  }
+  const d = e.target.dataset.del;
+  if(d === undefined) return;
+  if(state.clubs.length <= 1) return;
+  state.clubs.splice(+d, 1);
+  renderCalClubs(); render(); save();
+});
+
+$('calApply').onclick = () => {
+  const hit = parseFloat($('calHit').value);
+  const club = state.clubs.find(c => c.id === $('calClub').value);
+  if(!hit || !club){ $('calHint').textContent = 'Valitse maila ja syötä lyöty matka.'; return; }
+  if(club.lock){ $('calHint').textContent = club.name + ' on lukittu, eikä kelpaa referenssiksi.'; return; }
+  const sw = $('calSwing').value;
+  const b = club[sw];
+  const roll = b.t - b.c;
+  const measuredCarry = $('calType').value === 'total' ? hit - roll : hit;
+  const expectedCarry = b.c * envFactor();
+  if(expectedCarry <= 0){ return; }
+  let pct = (measuredCarry / expectedCarry - 1) * 100;
+  pct = Math.max(-15, Math.min(15, Math.round(pct * 2) / 2));
+  state.cond.form = pct;
+  syncInputs(); render(); save();
+  $('calHint').textContent = club.name + ' ' + SWSHORT[sw] + ': ' + hit + ' m → päivän kunto ' +
+    (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(1).replace('.',',') + ' %. Skaalattu kaikkiin paitsi lukittuihin mailoihin.';
+};
+$('calClear').onclick = () => {
+  state.cond.form = 0; syncInputs(); render(); save();
+  $('calHint').textContent = 'Kalibrointi poistettu, taulukossa perusarvot olosuhteilla korjattuna.';
+};
+
+$('findDist').oninput = renderFinder;
+$('findType').onchange = renderFinder;
+
+function syncInputs(){
+  $('temp').value = state.cond.temp;
+  $('alt').value = state.cond.alt;
+  $('form').value = state.cond.form;
+  $('baseTemp').value = state.base.temp;
+  $('baseAlt').value = state.base.alt;
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.sw === state.swing));
+}
+
+/* ---------- käynnistys ---------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+(async () => {
+  await load();
+  syncInputs();
+  renderCalClubs();
+  render();
+})();
+</script>
+</body>
+</html>
