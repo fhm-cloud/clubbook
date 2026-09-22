@@ -92,7 +92,23 @@ button.act{
 button.act.ghost{background:transparent;color:var(--pine);border:1px solid var(--rule)}
 button.act.sig{background:var(--signal);color:#241C00}
 button.act:active{transform:translateY(1px)}
+button.act:disabled{opacity:.4;cursor:default}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+textarea.import{
+  width:100%;min-height:108px;margin-top:4px;padding:9px 10px;resize:vertical;
+  border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);
+  font-family:var(--mono);font-size:13px;line-height:1.45
+}
+.imp-list{margin-top:10px;max-height:240px;overflow:auto}
+.imp-row{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:7px 0;border-bottom:1px solid var(--rule);font-size:14px
+}
+.imp-row .who{font-family:var(--disp);font-size:17px;font-weight:600}
+.imp-row .arrow{color:var(--muted);font-weight:500}
+.imp-row .meta{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.check{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px}
+.check input{width:18px;height:18px;accent-color:var(--pine)}
 
 /* ---------- swing tabs ---------- */
 .tabs{display:flex;background:var(--paper);border-bottom:1px solid var(--rule)}
@@ -242,9 +258,50 @@ button.act:active{transform:translateY(1px)}
   <div class="matrix" id="matrix"></div>
 
   <div class="foot">
+    <button class="act ghost" id="importBtn">Tuo Trackman</button>
     <button class="act ghost" id="editBtn">Muokkaa perusarvoja</button>
     <button class="act ghost hidden" id="addBtn">+ Maila</button>
   </div>
+
+  <section class="panel hidden" id="panelImport">
+    <h2>Tuo Map My Bagista</h2>
+    <p class="hint">Liitä mailat riveittäin tai valitse Trackman Performance Studion CSV. Kaksi lukua tarkoittaa carrya ja totalia, yksi luku carrya — bägin vanha rullaus säilyy. Saman mailan lyönnit tiivistetään yhdeksi mitaksi.</p>
+    <textarea class="import" id="importText" spellcheck="false" placeholder="Driver 203 225&#10;Puu 3 187 203&#10;i7 134"></textarea>
+    <input type="file" id="importFile" accept=".csv,.txt,text/csv,text/plain" hidden>
+    <div class="foot" style="padding:10px 0 0">
+      <button class="act ghost" id="importFileBtn" type="button">Valitse CSV</button>
+      <button class="act ghost" id="importPaste" type="button">Liitä</button>
+    </div>
+    <div class="row-2" style="margin-top:8px">
+      <label class="field"><span>Yksikkö</span>
+        <select id="importUnit">
+          <option value="m">Metrit</option>
+          <option value="yd">Jaardit</option>
+        </select>
+      </label>
+      <label class="field"><span>Yksi luku on</span>
+        <select id="importSingle">
+          <option value="carry">Carry</option>
+          <option value="total">Kokonaismatka</option>
+        </select>
+      </label>
+    </div>
+    <div class="row-2" style="margin-top:8px">
+      <label class="field"><span>Useasta lyönnistä</span>
+        <select id="importAgg">
+          <option value="median">Mediaani</option>
+          <option value="mean">Keskiarvo</option>
+        </select>
+      </label>
+    </div>
+    <label class="check"><input type="checkbox" id="importScale" checked> Skaalaa 3/4 ja puolikas samassa suhteessa</label>
+    <div class="imp-list" id="importPreview"></div>
+    <div class="foot" style="padding:12px 0 0">
+      <button class="act sig" id="importApply" type="button" disabled>Tuo bägiin</button>
+      <button class="act ghost" id="importClose" type="button">Sulje</button>
+    </div>
+    <p class="hint" id="importHint">Map My Bagin luvut on normalisoitu merenpintaan. Pidä peruskorkeus 0 m, niin päivän korkeuskorjaus osuu kohdalleen.</p>
+  </section>
 
   <!-- Mailahaku -->
   <section class="panel">
@@ -273,6 +330,7 @@ const SW = {full:'Täysi lyönti', three:'3/4 lyönti', half:'Puolikas lyönti'}
 const SWSHORT = {full:'täysi', three:'3/4', half:'½'};
 const UNC_PENALTY = 2.5;   // metriä: epävarman mailan sakko mailahaussa
 const STORE_KEY = 'mailakirja:v2';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* Toimii sekä Clauden artifact-ympäristössä (window.storage) että
    itse hostattuna verkkosovelluksena (localStorage). */
@@ -412,7 +470,7 @@ function renderMatrix(){
       row.style.gridTemplateColumns = '1fr 66px 66px 34px';
       const b = club[state.swing];
       row.innerHTML =
-        '<input class="cell name-in" type="text" value="'+club.name.replace(/"/g,'&quot;')+'" data-i="'+i+'" data-f="name">' +
+        '<input class="cell name-in" type="text" value="'+esc(club.name)+'" data-i="'+i+'" data-f="name">' +
         '<input class="cell" type="number" inputmode="numeric" value="'+b.c+'" data-i="'+i+'" data-f="c">' +
         '<input class="cell" type="number" inputmode="numeric" value="'+b.t+'" data-i="'+i+'" data-f="t">' +
         '<button class="del" data-del="'+i+'" aria-label="Poista maila">×</button>' +
@@ -428,7 +486,7 @@ function renderMatrix(){
       if(club.unc)  tags.push('<span class="u">epävarma</span>');
       const soft = club.unc ? ' soft' : '';
       row.innerHTML =
-        '<div><div class="club">'+club.name+'</div>' +
+        '<div><div class="club">'+esc(club.name)+'</div>' +
           (tags.length ? '<div class="tags">'+tags.join(' · ')+'</div>' : '') + '</div>' +
         '<div class="num'+soft+'"><b>'+a.c+'</b>'+(changed?'<small>'+a.bc+'</small>':'')+'</div>' +
         '<div class="num total'+soft+'"><b>'+a.t+'</b>'+(changed?'<small>'+a.bt+'</small>':'')+'</div>';
@@ -442,7 +500,7 @@ function renderCalClubs(){
   const cur = sel.value;
   const usable = state.clubs.filter(c => !c.lock);
   sel.innerHTML = usable.length
-    ? usable.map(c => '<option value="'+c.id+'">'+c.name+'</option>').join('')
+    ? usable.map(c => '<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')
     : '<option value="">Ei kalibroitavia mailoja</option>';
   if(usable.some(c => c.id === cur)) sel.value = cur;
 }
@@ -464,13 +522,360 @@ function renderFinder(){
   opts.sort((x,y) => x.rank - y.rank);
   box.innerHTML = opts.slice(0,3).map((o,i) =>
     '<div class="find-item'+(i===0?' best':'')+'">' +
-      '<div><span class="fi-club">'+o.name+'</span><span class="fi-sw">'+SWSHORT[o.sw] +
+      '<div><span class="fi-club">'+esc(o.name)+'</span><span class="fi-sw">'+SWSHORT[o.sw] +
         (o.unc ? ' · epävarma' : '')+'</span></div>' +
       '<div><span class="fi-d">'+o.v+' m</span><span class="fi-off">'+(o.off>=0?'+':'−')+Math.abs(o.off)+'</span></div>' +
     '</div>').join('');
 }
 
 function render(){ renderHeader(); renderMatrix(); renderFinder(); }
+
+/* ---------- Trackman-tuonti ---------- */
+function splitRow(line, delim){
+  const out = [];
+  let cur = '', q = false;
+  for(let i = 0; i < line.length; i++){
+    const ch = line[i];
+    if(q){
+      if(ch === '"'){
+        if(line[i + 1] === '"'){ cur += '"'; i++; }
+        else q = false;
+      }else cur += ch;
+    }else if(ch === '"') q = true;
+    else if(ch === delim){ out.push(cur.trim()); cur = ''; }
+    else cur += ch;
+  }
+  out.push(cur.trim());
+  return out;
+}
+function detectDelim(line){
+  const counts = {'\t':0, ';':0, ',':0};
+  let q = false;
+  for(const ch of line){
+    if(ch === '"') q = !q;
+    else if(!q && counts[ch] != null) counts[ch]++;
+  }
+  if(counts['\t'] >= 1 && counts['\t'] >= counts[';'] && counts['\t'] >= counts[',']) return '\t';
+  if(counts[';'] >= 1 && counts[';'] >= counts[',']) return ';';
+  if(counts[','] >= 1) return ',';
+  return ' ';
+}
+function parseNum(s){
+  if(s == null) return null;
+  let t = String(s).trim().replace(/\s/g, '').replace(/(m|yd|yds)$/i, '');
+  if(!t || t === '-' || t === '—' || t === 'n/a') return null;
+  if(t.includes(',') && t.includes('.')){
+    if(t.lastIndexOf(',') > t.lastIndexOf('.')) t = t.replace(/\./g, '').replace(',', '.');
+    else t = t.replace(/,/g, '');
+  }else if(t.includes(',')) t = t.replace(',', '.');
+  const n = parseFloat(t);
+  return Number.isFinite(n) ? n : null;
+}
+function normHeader(h){
+  return String(h || '').toLowerCase().replace(/[._]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function headerCols(cells){
+  const norm = cells.map(normHeader);
+  const idxs = pred => norm.map((h, i) => pred(h) ? i : -1).filter(i => i >= 0);
+  const prefer = (list, pred) => list.find(i => pred(norm[i]));
+  const club = idxs(h => /^(club( name| type)?|maila|klubi)$/.test(h))[0];
+  if(club == null) return null;
+  const carryAll = idxs(h => /(^| )carry( |$)|kantama/.test(h) && !/side|deviat|time|suunta|height/.test(h));
+  const totalAll = idxs(h => /(^| )total( |$)|kokonaismatka/.test(h) && !/side|deviat|suunta/.test(h));
+  const carry = prefer(carryAll, h => /flat|normal/.test(h));
+  const total = prefer(totalAll, h => /flat|normal/.test(h));
+  if(carry == null && total == null && carryAll.length + totalAll.length === 0) return null;
+  return {club, carry: carry != null ? carry : (carryAll[0] != null ? carryAll[0] : null), total: total != null ? total : (totalAll[0] != null ? totalAll[0] : null)};
+}
+function findHeader(lines){
+  for(let i = 0; i < Math.min(lines.length, 25); i++){
+    const delim = detectDelim(lines[i]);
+    if(delim === ' '){
+      const cells = lines[i].split(/\s+/);
+      const cols = headerCols(cells);
+      if(cols && (cols.carry != null || cols.total != null)) return {i, delim, cols};
+      continue;
+    }
+    const cols = headerCols(splitRow(lines[i], delim));
+    if(cols && (cols.carry != null || cols.total != null)) return {i, delim, cols};
+  }
+  return null;
+}
+function parseLooseLine(line){
+  let s = line.trim();
+  if(!s || s.startsWith('#')) return null;
+  s = s.replace(/[;\t|]+/g, ' ').replace(/\s+/g, ' ');
+  s = s.replace(/(\d+(?:[.,]\d+)?)\s*(m|yd|yds)\b/gi, '$1');
+  const parts = s.split(' ');
+  const nums = [];
+  while(parts.length && /^-?\d+(?:[.,]\d+)?$/.test(parts[parts.length - 1])){
+    nums.unshift(parts.pop());
+    if(nums.length === 2) break;
+  }
+  const name = parts.join(' ').trim();
+  if(!name || !nums.length) return null;
+  if(/^(average|keskiarvo|avg|maila|club|club name|carry|total)$/i.test(name)) return null;
+  return {name, a: parseNum(nums[0]), b: nums.length > 1 ? parseNum(nums[1]) : null};
+}
+function cleanName(name){
+  return String(name).replace(/^["']|["']$/g, '').replace(/\s+/g, ' ').trim();
+}
+function aggregate(values, mode){
+  const xs = values.filter(v => v != null && v > 0 && v < 800);
+  if(!xs.length) return null;
+  if(mode === 'mean') return xs.reduce((a, b) => a + b, 0) / xs.length;
+  const s = xs.slice().sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+function roundM(v){ return v == null ? null : Math.round(v); }
+function estimateRoll(carry){
+  if(carry >= 180) return Math.round(carry * 0.09);
+  if(carry >= 150) return Math.round(carry * 0.06);
+  if(carry >= 110) return Math.round(carry * 0.045);
+  return Math.max(2, Math.round(carry * 0.03));
+}
+
+function parseTrackman(text, opts){
+  const raw = String(text || '').replace(/^\uFEFF/, '').replace(/\u00a0/g, ' ').trim();
+  if(!raw) return {clubs:[], unit: opts.unit, unitNote:null, skipped:0, error:null};
+  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const header = findHeader(lines);
+  const shots = [];
+  if(header && header.delim !== ' '){
+    for(let r = header.i + 1; r < lines.length; r++){
+      const cells = splitRow(lines[r], header.delim);
+      if(headerCols(cells)) continue;
+      let name = cleanName(cells[header.cols.club] || '');
+      if(!name) continue;
+      let avg = false;
+      if(/^(average|keskiarvo|avg)$/i.test(name)){
+        avg = true;
+        name = shots.length ? shots[shots.length - 1].name : '';
+        if(!name) continue;
+      }
+      const carry = header.cols.carry == null ? null : parseNum(cells[header.cols.carry]);
+      const total = header.cols.total == null ? null : parseNum(cells[header.cols.total]);
+      if(carry == null && total == null) continue;
+      shots.push({name, carry, total, avg});
+    }
+  }else{
+    const start = header ? header.i + 1 : 0;
+    for(let r = start; r < lines.length; r++){
+      const row = parseLooseLine(lines[r]);
+      if(!row || (row.a == null && row.b == null)) continue;
+      let carry, total;
+      if(row.b != null){ carry = row.a; total = row.b; }
+      else if(opts.single === 'total'){ carry = null; total = row.a; }
+      else { carry = row.a; total = null; }
+      shots.push({name: cleanName(row.name), carry, total, avg:false});
+    }
+  }
+  let unit = opts.unit;
+  let unitNote = null;
+  const rawVals = shots.flatMap(s => [s.carry, s.total].filter(v => v != null));
+  const rawMax = rawVals.length ? Math.max.apply(null, rawVals) : 0;
+  const headerText = header ? lines[header.i] : '';
+  const headerYards = /\b(yd|yds|yards|jaardi|jaardia)\b/i.test(headerText) && !/\b(meter|metri|metres|meters)\b/i.test(headerText);
+  if(!opts.unitTouched && (headerYards || rawMax > 320)){
+    unit = 'yd';
+    unitNote = headerYards
+      ? 'Yksiköksi valittiin jaardit otsikon perusteella.'
+      : 'Yksiköksi valittiin jaardit, koska suurin luku on yli 320.';
+  }
+  const toM = v => v == null ? null : (unit === 'yd' ? v * 0.9144 : v);
+  const groups = new Map();
+  shots.forEach(s => {
+    const key = s.name.toLowerCase();
+    if(!groups.has(key)) groups.set(key, {name:s.name, shots:[], avgs:[]});
+    const g = groups.get(key);
+    (s.avg ? g.avgs : g.shots).push(s);
+  });
+  const clubs = [];
+  let skipped = 0;
+  groups.forEach(g => {
+    const src = g.avgs.length ? g.avgs : g.shots;
+    const carry = roundM(aggregate(src.map(s => toM(s.carry)), opts.agg));
+    const total = roundM(aggregate(src.map(s => toM(s.total)), opts.agg));
+    const bad = (v) => v != null && (v < 5 || v > 450);
+    if((carry == null && total == null) || bad(carry) || bad(total)){ skipped++; return; }
+    clubs.push({name:g.name, carry, total, n:src.length, fromAvg:g.avgs.length > 0});
+  });
+  return {
+    clubs, unit, unitNote, skipped,
+    error: clubs.length ? null : 'Ei tunnistettuja mailoja. Yksi maila per rivi, esimerkiksi Driver 203 225.'
+  };
+}
+
+function clubKeys(name){
+  const low = String(name).toLowerCase().trim();
+  const compact = low.replace(/[^a-z0-9äöå]/g, '');
+  const keys = [['exact', compact]];
+  const loft = (low.match(/(\d{2})\s*°/) || (/^\d{2}°?$/.test(low.trim()) ? [null, low.match(/\d{2}/)[0]] : null));
+  if(loft) keys.push(['loft', loft[1]]);
+  let kind = '', num = (low.match(/(\d+)/) || [])[1] || '';
+  if(/^(driver|dr)$/.test(compact) || /\bdriver\b/.test(low)) kind = 'driver';
+  else if(/^(pw|pitching(wedge)?)$/.test(compact) || /pitching/.test(low) || /(^|[^a-z])pw([^a-z]|$)/.test(low)) kind = 'pw';
+  else if(/^(gw|aw|gap(wedge)?|approach(wedge)?)$/.test(compact) || /\bgap\b|\bapproach\b/.test(low) || /(^|[^a-z])(gw|aw)([^a-z]|$)/.test(low)) kind = 'gw';
+  else if(/^(sw|sand(wedge)?)$/.test(compact) || /\bsand\b/.test(low) || /(^|[^a-z])sw([^a-z]|$)/.test(low)) kind = 'sw';
+  else if(/^(lw|lob(wedge)?)$/.test(compact) || /\blob\b/.test(low) || /(^|[^a-z])lw([^a-z]|$)/.test(low)) kind = 'lw';
+  else if(/^(\d{1,2})h(y|yb|ybrid)?$/.test(compact) || /hybrid|hybridi/.test(low)) kind = 'hybrid';
+  else if(/^(\d{1,2})w(ood)?$/.test(compact) || /wood|puu|fairway/.test(low)) kind = 'wood';
+  else if(/iron|rauta/.test(low) || /^i\d{1,2}$/.test(compact) || /^\d{1,2}i$/.test(compact)) kind = 'iron';
+  if(kind === 'driver') keys.push(['kind', 'driver']);
+  else if(kind && num && (kind === 'iron' || kind === 'wood' || kind === 'hybrid')) keys.push(['kn', kind + ':' + num]);
+  else if(kind === 'pw' || kind === 'gw' || kind === 'sw' || kind === 'lw') keys.push(['kind', kind]);
+  return keys;
+}
+function keyScore(a, b){
+  const has = (keys, type, val) => keys.some(k => k[0] === type && k[1] === val);
+  let score = 0;
+  a.forEach(k => {
+    if(!has(b, k[0], k[1])) return;
+    const w = k[0] === 'exact' ? 100 : k[0] === 'loft' ? 80 : k[0] === 'kn' ? 70 : 50;
+    if(w > score) score = w;
+  });
+  return score;
+}
+function loftNum(name){
+  const m = String(name).match(/(^|[^0-9])(\d{2})(?!\d)/);
+  return m ? +m[2] : null;
+}
+function wedgeBand(kind){
+  if(kind === 'pw') return [40, 49];
+  if(kind === 'gw') return [50, 53];
+  if(kind === 'sw') return [54, 57];
+  if(kind === 'lw') return [58, 64];
+  return null;
+}
+function matchClub(name, clubs){
+  const mine = clubKeys(name);
+  let best = 0;
+  const hits = [];
+  clubs.forEach(c => {
+    const s = keyScore(mine, clubKeys(c.name));
+    if(s > best){ best = s; hits.length = 0; hits.push(c); }
+    else if(s === best && s > 0) hits.push(c);
+  });
+  if(hits.length === 1) return {club:hits[0], ambiguous:false};
+  if(hits.length > 1) return {club:null, ambiguous:true};
+  const kind = (mine.find(k => k[0] === 'kind') || [])[1];
+  const band = wedgeBand(kind);
+  const hasLoft = mine.some(k => k[0] === 'loft');
+  if(band && !hasLoft){
+    const bandHits = clubs.filter(c => {
+      const L = loftNum(c.name);
+      return L != null && L >= band[0] && L <= band[1];
+    });
+    if(bandHits.length === 1) return {club:bandHits[0], ambiguous:false};
+  }
+  return {club:null, ambiguous:false};
+}
+function resolveDistances(row, club){
+  let carry = row.carry, total = row.total;
+  if(club){
+    const roll = club.full.t - club.full.c;
+    if(carry == null) carry = Math.max(1, Math.round(total - roll));
+    if(total == null) total = Math.round(carry + Math.max(0, roll));
+  }else{
+    if(carry == null){
+      const roll = estimateRoll(total);
+      carry = Math.max(1, total - roll);
+    }
+    if(total == null) total = carry + estimateRoll(carry);
+  }
+  return {carry, total};
+}
+function scalePartials(club, carry, total){
+  const oldC = club.full.c;
+  const oldRoll = club.full.t - club.full.c;
+  const ratios = ['three', 'half'].map(sw => ({
+    sw,
+    cRatio: oldC > 0 ? club[sw].c / oldC : (sw === 'three' ? 0.82 : 0.58),
+    rRatio: oldRoll !== 0 ? (club[sw].t - club[sw].c) / oldRoll : (sw === 'three' ? 0.85 : 0.70)
+  }));
+  club.full.c = carry;
+  club.full.t = total;
+  const newRoll = total - carry;
+  ratios.forEach(p => {
+    const c = Math.round(carry * p.cRatio);
+    club[p.sw].c = c;
+    club[p.sw].t = c + Math.round(newRoll * p.rRatio);
+  });
+}
+
+let importUnitTouched = false;
+
+function importOptions(){
+  return {
+    unit: $('importUnit').value,
+    single: $('importSingle').value,
+    agg: $('importAgg').value,
+    unitTouched: importUnitTouched
+  };
+}
+function refreshImport(){
+  const parsed = parseTrackman($('importText').value, importOptions());
+  importParsed = parsed;
+  if(parsed.unit !== $('importUnit').value) $('importUnit').value = parsed.unit;
+  const box = $('importPreview');
+  box.innerHTML = parsed.clubs.map(row => {
+    const hit = matchClub(row.name, state.clubs);
+    const dest = hit.club ? ' <span class="arrow">→ ' + esc(hit.club.name) + '</span>' : (hit.ambiguous ? ' <span class="arrow">uusi, nimi täsmää useaan</span>' : ' <span class="arrow">uusi</span>');
+    const d = resolveDistances(row, hit.club);
+    const bits = ['c ' + d.carry, 't ' + d.total];
+    if(hit.club && (row.carry == null || row.total == null)) bits.push('rullaus ennallaan');
+    else if(!hit.club && (row.carry == null || row.total == null)) bits.push('rullaus arvio');
+    bits.push(row.fromAvg ? 'keskiarvo' : (row.n === 1 ? '1 lyönti' : row.n + ' lyöntiä'));
+    return '<div class="imp-row"><div class="who">' + esc(row.name) + dest + '</div><div class="meta">' + bits.join(' · ') + '</div></div>';
+  }).join('');
+  $('importApply').disabled = parsed.clubs.length === 0;
+  const notes = [];
+  if($('importText').value.trim() && parsed.error) notes.push(parsed.error);
+  if(parsed.unitNote) notes.push(parsed.unitNote);
+  if(parsed.skipped) notes.push(parsed.skipped + (parsed.skipped === 1 ? ' rivi ohitettiin.' : ' riviä ohitettiin.'));
+  if(!notes.length) notes.push('Map My Bagin luvut on normalisoitu merenpintaan. Pidä peruskorkeus 0 m, niin päivän korkeuskorjaus osuu kohdalleen.');
+  $('importHint').textContent = notes.join(' ');
+}
+function setImportOpen(open){
+  $('panelImport').classList.toggle('hidden', !open);
+  $('importBtn').textContent = open ? 'Sulje tuonti' : 'Tuo Trackman';
+  $('importBtn').classList.toggle('sig', open);
+  $('importBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(open){
+    $('panelCond').classList.add('hidden');
+    $('panelCal').classList.add('hidden');
+    if(!reduce) $('panelImport').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+function applyImport(){
+  const parsed = parseTrackman($('importText').value, importOptions());
+  if(!parsed.clubs.length){ refreshImport(); return; }
+  const scale = $('importScale').checked;
+  let updated = 0, added = 0;
+  parsed.clubs.forEach(row => {
+    const hit = matchClub(row.name, state.clubs);
+    const club = hit.club;
+    const d = resolveDistances(row, club);
+    if(club){
+      if(scale) scalePartials(club, d.carry, d.total);
+      else { club.full.c = d.carry; club.full.t = d.total; }
+      updated++;
+    }else{
+      state.clubs.push(makeClub(row.name, d.carry, d.total));
+      added++;
+    }
+  });
+  renderCalClubs();
+  render();
+  save();
+  const parts = [];
+  if(updated) parts.push(updated + ' päivitetty');
+  if(added) parts.push(added + ' lisätty');
+  $('importHint').textContent = 'Tuotu bägiin: ' + parts.join(', ') + '.';
+  refreshImport();
+  $('importHint').textContent = 'Tuotu bägiin: ' + parts.join(', ') + '.';
+}
 
 /* ---------- tapahtumat ---------- */
 $('chipCond').onclick = () => { $('panelCond').classList.toggle('hidden'); $('panelCal').classList.add('hidden'); };
@@ -497,6 +902,33 @@ document.querySelectorAll('.tab').forEach(t => {
     render(); save();
   };
 });
+
+$('importBtn').onclick = () => setImportOpen($('panelImport').classList.contains('hidden'));
+$('importClose').onclick = () => setImportOpen(false);
+$('importFileBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => { $('importText').value = String(reader.result || ''); refreshImport(); };
+  reader.readAsText(f);
+};
+$('importPaste').onclick = async () => {
+  try{
+    const t = await navigator.clipboard.readText();
+    if(!t){ $('importHint').textContent = 'Leikepöytä on tyhjä.'; return; }
+    $('importText').value = t;
+    refreshImport();
+  }catch(err){
+    $('importHint').textContent = 'Liittäminen leikepöydältä ei onnistunut. Liitä teksti kenttään käsin.';
+  }
+};
+$('importText').addEventListener('input', refreshImport);
+$('importUnit').onchange = () => { importUnitTouched = true; refreshImport(); };
+$('importSingle').onchange = refreshImport;
+$('importAgg').onchange = refreshImport;
+$('importApply').onclick = applyImport;
 
 $('editBtn').onclick = () => {
   state.edit = !state.edit;
