@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,14 +7,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Mailakirja">
+<meta name="apple-mobile-web-app-title" content="Clubbook">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<title>Mailakirja</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Clubbook</title>
 <style>
 :root{
   --paper:#E7EAE3;
@@ -25,9 +22,10 @@
   --rule:#C9D2C5;
   --signal:#E4A300;
   --cool:#4A6E86;
-  --disp:'Barlow Condensed','Helvetica Neue Condensed','Arial Narrow',system-ui,sans-serif;
-  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --disp:var(--font);
+  --mono:var(--font);
+  --body:var(--font);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -37,57 +35,54 @@ body{
   padding-bottom:calc(48px + env(safe-area-inset-bottom));
 }
 .wrap{max-width:520px;margin:0 auto}
-.eyebrow{
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.16em;
-  font-size:12px;font-weight:600;color:var(--muted)
-}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted)}
 
 /* ---------- header / calibration meter ---------- */
 html{background:var(--pine)}
 .head{background:var(--pine);color:#EAF0E9;position:relative;padding:calc(14px + env(safe-area-inset-top)) 16px 16px}
 .head-top{display:flex;justify-content:space-between;align-items:baseline}
 .head-top .eyebrow{color:#8FA697}
-.brand{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.brand{font-size:22px;font-weight:700;letter-spacing:-.02em}
 .factor{display:flex;align-items:flex-end;gap:10px;margin-top:8px}
-.factor-num{font-family:var(--disp);font-size:60px;line-height:.82;font-weight:700;font-variant-numeric:tabular-nums}
-.factor-lab{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:#8FA697;padding-bottom:6px}
+.factor-num{font-size:56px;line-height:.85;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.factor-lab{font-size:13px;font-weight:600;color:#8FA697;padding-bottom:6px;line-height:1.2}
 .meter{margin-top:12px;height:4px;background:rgba(255,255,255,.14);position:relative;border-radius:2px}
 .meter-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:rgba(255,255,255,.4)}
 .meter-fill{position:absolute;top:0;bottom:0;background:var(--signal);border-radius:2px;transition:left .35s ease,width .35s ease}
-.meter-scale{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);font-size:10px;color:#7D9488}
+.meter-scale{display:flex;justify-content:space-between;margin-top:5px;font-size:12px;font-variant-numeric:tabular-nums;color:#7D9488}
 .cond-line{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
 .chip{
-  font-family:var(--mono);font-size:12px;padding:5px 9px;border-radius:999px;
+  font:inherit;font-size:13px;font-weight:600;padding:6px 10px;border-radius:999px;
   background:rgba(255,255,255,.09);color:#DCE6DB;border:0;cursor:pointer
 }
 .chip:hover{background:rgba(255,255,255,.16)}
 
 /* ---------- panels ---------- */
 .panel{background:var(--panel);border-bottom:1px solid var(--rule);padding:14px 16px}
-.panel h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 10px}
+.panel h2{font-size:13px;font-weight:650;color:var(--muted);margin:0 0 10px}
 .hidden{display:none}
 
 .ctrl{margin-bottom:14px}
 .ctrl:last-child{margin-bottom:0}
 .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
 .ctrl-name{font-size:14px}
-.ctrl-val{font-family:var(--mono);font-size:15px;font-weight:500}
+.ctrl-val{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
 input[type=range]{width:100%;accent-color:var(--pine);height:26px}
 
 .row-2{display:flex;gap:8px}
 .row-2>*{flex:1;min-width:0}
 label.field{display:block}
 label.field span{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
-input[type=number],input[type=text],select{
+input[type=number],input[type=text],select,textarea{
   width:100%;padding:9px 10px;border:1px solid var(--rule);background:#fff;
-  border-radius:6px;font-family:var(--mono);font-size:16px;color:var(--ink)
+  border-radius:10px;font:inherit;font-size:16px;color:var(--ink)
 }
-select{font-family:var(--body);font-size:15px}
+select{font-size:15px}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
 
 button.act{
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-size:14px;
-  padding:11px 14px;border:0;border-radius:6px;background:var(--pine);color:#fff;cursor:pointer
+  font:inherit;font-weight:650;font-size:15px;
+  padding:11px 14px;border:0;border-radius:10px;background:var(--pine);color:#fff;cursor:pointer
 }
 button.act.ghost{background:transparent;color:var(--pine);border:1px solid var(--rule)}
 button.act.sig{background:var(--signal);color:#241C00}
@@ -95,29 +90,29 @@ button.act:active{transform:translateY(1px)}
 button.act:disabled{opacity:.4;cursor:default}
 .hint{font-size:12.5px;color:var(--muted);margin-top:8px}
 textarea.import{
-  width:100%;min-height:108px;margin-top:4px;padding:9px 10px;resize:vertical;
-  border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);
-  font-family:var(--mono);font-size:13px;line-height:1.45
+  min-height:108px;margin-top:4px;resize:vertical;line-height:1.45
 }
 .imp-list{margin-top:10px;max-height:240px;overflow:auto}
 .imp-row{
   display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   padding:7px 0;border-bottom:1px solid var(--rule);font-size:14px
 }
-.imp-row .who{font-family:var(--disp);font-size:17px;font-weight:600}
+.imp-row .who{font-size:16px;font-weight:650}
 .imp-row .arrow{color:var(--muted);font-weight:500}
-.imp-row .meta{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.imp-row .meta{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
 .check{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px}
 .check input{width:18px;height:18px;accent-color:var(--pine)}
 
 /* ---------- swing tabs ---------- */
-.tabs{display:flex;background:var(--paper);border-bottom:1px solid var(--rule)}
+.tabs{display:flex;gap:2px;overflow-x:auto;background:var(--paper);border-bottom:1px solid var(--rule);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tab{
-  flex:1;padding:12px 4px;border:0;background:transparent;cursor:pointer;
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.12em;font-size:13px;font-weight:600;
+  flex:0 0 auto;padding:12px 14px;border:0;background:transparent;cursor:pointer;
+  font:inherit;font-size:15px;font-weight:650;
   color:var(--muted);border-bottom:3px solid transparent
 }
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--signal)}
+.tab.add{color:var(--pine)}
 
 /* ---------- matrix ---------- */
 .matrix{padding:0 0 4px}
@@ -126,22 +121,22 @@ textarea.import{
   padding:9px 16px;border-bottom:1px solid var(--rule)
 }
 .mrow.head-row{border-bottom:1px solid var(--ink);padding-top:12px;padding-bottom:6px;position:sticky;top:0;background:var(--paper);z-index:2}
-.mrow.head-row div{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--muted)}
+.mrow.head-row div{font-size:12px;font-weight:650;color:var(--muted)}
 .mrow .num,.mrow .head-row div:not(:first-child){text-align:right}
-.club{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:.02em}
-.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.club{font-size:17px;font-weight:650;letter-spacing:-.01em}
+.num{text-align:right;font-variant-numeric:tabular-nums}
 .num b{font-size:20px;font-weight:500;letter-spacing:-.02em}
 .num small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
 .num.total b{color:var(--muted);font-weight:400}
 .mrow input.cell{padding:6px 6px;text-align:right;font-size:15px}
 .mrow .flags{grid-column:1/-1;display:flex;gap:6px;margin-top:6px}
 .flag{
-  font-family:var(--disp);text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;
+  font:inherit;font-size:13px;font-weight:650;
   padding:6px 10px;border-radius:999px;border:1px solid var(--rule);background:#fff;color:var(--muted);cursor:pointer
 }
 .flag[aria-pressed="true"]{background:var(--pine);border-color:var(--pine);color:#EAF0E9}
 .flag.unc[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:#241C00}
-.tags{font-family:var(--disp);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--muted);margin-top:1px}
+.tags{font-size:12px;font-weight:600;color:var(--muted);margin-top:1px}
 .tags .u{color:#9A7400}
 .num.soft b{font-weight:400;border-bottom:1px dotted var(--rule)}
 .mrow .name-in{font-family:var(--body);font-size:15px;text-align:left}
@@ -153,16 +148,23 @@ textarea.import{
   display:flex;justify-content:space-between;align-items:baseline;
   background:#fff;border:1px solid var(--rule);border-radius:6px;padding:9px 11px
 }
-.find-item .fi-club{font-family:var(--disp);font-size:17px;font-weight:600}
-.find-item .fi-sw{font-size:12px;color:var(--muted);margin-left:7px;font-family:var(--body)}
-.find-item .fi-d{font-family:var(--mono);font-size:15px}
-.find-item .fi-off{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px}
+.find-item .fi-club{font-size:17px;font-weight:650}
+.find-item .fi-sw{font-size:13px;color:var(--muted);margin-left:7px}
+.find-item .fi-d{font-size:15px;font-weight:650;font-variant-numeric:tabular-nums}
+.find-item .fi-off{font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted);margin-left:8px}
 .find-item.best{border-color:var(--signal);box-shadow:inset 3px 0 0 var(--signal)}
 
 .foot{padding:16px;display:flex;gap:8px;flex-wrap:wrap}
 .foot .sp{flex:1}
 .note{padding:0 16px 24px;font-size:12px;color:var(--muted);line-height:1.5}
-.saved{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 16px 8px}
+.saved{font-size:12px;color:var(--muted);padding:0 16px 8px}
+.seg{display:flex;background:#fff;border:1px solid var(--rule);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:9px 8px;font:inherit;font-weight:650;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pine);color:#fff}
+.swing-edit{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.swing-edit input{flex:1}
+.set-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.set-top h2{margin:0}
 
 @media (prefers-reduced-motion: reduce){
   *{transition:none !important}
@@ -174,143 +176,140 @@ textarea.import{
 
   <header class="head">
     <div class="head-top">
-      <div class="brand">Mailakirja</div>
-      <div class="eyebrow" id="swingLabel">Täysi lyönti</div>
+      <div class="brand">Clubbook</div>
+      <div class="eyebrow" id="swingLabel">Full</div>
     </div>
 
     <div class="factor">
-      <div class="factor-num" id="factorNum">100 %</div>
-      <div class="factor-lab">kantamasta<br>tänään</div>
+      <div class="factor-num" id="factorNum">100%</div>
+      <div class="factor-lab">of your carry<br>today</div>
     </div>
 
     <div class="meter">
       <div class="meter-zero"></div>
       <div class="meter-fill" id="meterFill"></div>
     </div>
-    <div class="meter-scale"><span>−15 %</span><span>perus</span><span>+15 %</span></div>
+    <div class="meter-scale"><span>−15%</span><span>stock</span><span>+15%</span></div>
 
     <div class="cond-line">
       <button class="chip" id="chipCond">🌡 <span id="chipCondTxt">15 °C · 0 m</span></button>
-      <button class="chip" id="chipCal">🎯 <span id="chipCalTxt">Kalibroi</span></button>
+      <button class="chip" id="chipCal">🎯 <span id="chipCalTxt">Calibrate</span></button>
+      <button class="chip" id="chipSettings">Settings</button>
     </div>
   </header>
 
+  <div id="bag">
+
   <!-- Olosuhteet -->
   <section class="panel hidden" id="panelCond">
-    <h2>Olosuhteet tänään</h2>
+    <h2>Today</h2>
 
     <div class="ctrl">
-      <div class="ctrl-head"><span class="ctrl-name">Lämpötila</span><span class="ctrl-val" id="tempVal">15 °C</span></div>
+      <div class="ctrl-head"><span class="ctrl-name">Temperature</span><span class="ctrl-val" id="tempVal">15 °C</span></div>
       <input type="range" id="temp" min="-10" max="40" step="1" value="15">
     </div>
 
     <div class="ctrl">
-      <div class="ctrl-head"><span class="ctrl-name">Korkeus merenpinnasta</span><span class="ctrl-val" id="altVal">0 m</span></div>
+      <div class="ctrl-head"><span class="ctrl-name">Elevation</span><span class="ctrl-val" id="altVal">0 m</span></div>
       <input type="range" id="alt" min="0" max="2500" step="25" value="0">
     </div>
 
     <div class="ctrl">
-      <div class="ctrl-head"><span class="ctrl-name">Päivän kunto</span><span class="ctrl-val" id="formVal">±0 %</span></div>
+      <div class="ctrl-head"><span class="ctrl-name">Day form</span><span class="ctrl-val" id="formVal">0%</span></div>
       <input type="range" id="form" min="-15" max="15" step="0.5" value="0">
     </div>
 
-    <h2 style="margin-top:18px">Perusarvojen olosuhteet</h2>
+    <h2 style="margin-top:18px">Baseline for the book</h2>
     <div class="row-2">
-      <label class="field"><span>Lämpötila °C</span><input type="number" id="baseTemp" value="15" step="1"></label>
-      <label class="field"><span>Korkeus m</span><input type="number" id="baseAlt" value="0" step="10"></label>
+      <label class="field"><span id="baseTempLab">Temperature °C</span><input type="number" id="baseTemp" value="15" step="1"></label>
+      <label class="field"><span id="baseAltLab">Elevation m</span><input type="number" id="baseAlt" value="0" step="10"></label>
     </div>
-    <p class="hint">Nämä ovat olosuhteet, joissa taulukon perusmetrit on mitattu. Kaikki muutokset lasketaan suhteessa näihin.</p>
+    <p class="hint">These are the conditions the stock distances were measured in. Every change is relative to them.</p>
     <div class="foot" style="padding:14px 0 0">
-      <button class="act ghost" id="resetDay">Nollaa päivä</button>
+      <button class="act ghost" id="resetDay">Reset today</button>
     </div>
   </section>
 
   <!-- Kalibrointi -->
   <section class="panel hidden" id="panelCal">
-    <h2>Kalibroi yhdellä lyönnillä</h2>
+    <h2>Calibrate with one shot</h2>
     <div class="row-2">
-      <label class="field"><span>Maila</span><select id="calClub"></select></label>
-      <label class="field"><span>Lyönti</span><select id="calSwing">
-        <option value="full">Täysi</option><option value="three">3/4</option><option value="half">Puolikas</option>
-      </select></label>
+      <label class="field"><span>Club</span><select id="calClub"></select></label>
+      <label class="field"><span>Swing</span><select id="calSwing"></select></label>
     </div>
     <div class="row-2" style="margin-top:8px">
-      <label class="field"><span>Löin (m)</span><input type="number" id="calHit" inputmode="decimal" placeholder="128"></label>
-      <label class="field"><span>Mitta</span><select id="calType">
-        <option value="total">Kokonaismatka</option><option value="carry">Carry</option>
+      <label class="field"><span id="calHitLab">I hit (m)</span><input type="number" id="calHit" inputmode="decimal" placeholder="128"></label>
+      <label class="field"><span>Number</span><select id="calType">
+        <option value="total">Total</option><option value="carry">Carry</option>
       </select></label>
     </div>
     <div class="foot" style="padding:12px 0 0">
-      <button class="act sig" id="calApply">Kalibroi kaikki</button>
+      <button class="act sig" id="calApply">Calibrate all</button>
       <div class="sp"></div>
-      <button class="act ghost" id="calClear">Poista kalibrointi</button>
+      <button class="act ghost" id="calClear">Clear</button>
     </div>
-    <p class="hint" id="calHint">Lyö referenssilyönti, syötä mitattu matka — koko taulukko skaalautuu samassa suhteessa. Lämpötila ja korkeus on jo huomioitu, joten jäljelle jää päivän kunto.</p>
+    <p class="hint" id="calHint">Hit one reference shot and enter the distance. The book scales by the same ratio. Temperature and elevation are already included, so what remains is your form.</p>
   </section>
 
   <!-- Swing tabs -->
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-sw="full" aria-selected="true">Täysi</button>
-    <button class="tab" role="tab" data-sw="three" aria-selected="false">3/4</button>
-    <button class="tab" role="tab" data-sw="half" aria-selected="false">Puolikas</button>
-  </div>
+  <div class="tabs" id="tabs" role="tablist"></div>
 
   <div class="matrix" id="matrix"></div>
 
   <div class="foot">
-    <button class="act ghost" id="importBtn">Tuo Trackman</button>
-    <button class="act ghost" id="editBtn">Muokkaa perusarvoja</button>
-    <button class="act ghost hidden" id="addBtn">+ Maila</button>
+    <button class="act ghost" id="importBtn">Import Trackman</button>
+    <button class="act ghost" id="editBtn">Edit stock distances</button>
+    <button class="act ghost hidden" id="addBtn">Add club</button>
   </div>
 
   <section class="panel hidden" id="panelImport">
-    <h2>Tuo Map My Bagista</h2>
-    <p class="hint">Liitä mailat riveittäin tai valitse Trackman Performance Studion CSV. Kaksi lukua tarkoittaa carrya ja totalia, yksi luku carrya — bägin vanha rullaus säilyy. Saman mailan lyönnit tiivistetään yhdeksi mitaksi.</p>
-    <textarea class="import" id="importText" spellcheck="false" placeholder="Driver 203 225&#10;Puu 3 187 203&#10;i7 134"></textarea>
+    <h2>Import from Map My Bag</h2>
+    <p class="hint">Paste one club per line, or choose a Trackman Performance Studio CSV. Two numbers are carry and total. One number is carry, and the club’s rollout stays. Several shots with the same club collapse into one distance.</p>
+    <textarea class="import" id="importText" spellcheck="false" placeholder="Driver 222 246&#10;3 Wood 205 222&#10;7 Iron 147"></textarea>
     <input type="file" id="importFile" accept=".csv,.txt,text/csv,text/plain" hidden>
     <div class="foot" style="padding:10px 0 0">
-      <button class="act ghost" id="importFileBtn" type="button">Valitse CSV</button>
-      <button class="act ghost" id="importPaste" type="button">Liitä</button>
+      <button class="act ghost" id="importFileBtn" type="button">Choose CSV</button>
+      <button class="act ghost" id="importPaste" type="button">Paste</button>
     </div>
     <div class="row-2" style="margin-top:8px">
-      <label class="field"><span>Yksikkö</span>
+      <label class="field"><span>Unit</span>
         <select id="importUnit">
-          <option value="m">Metrit</option>
-          <option value="yd">Jaardit</option>
+          <option value="m">Meters</option>
+          <option value="yd">Yards</option>
         </select>
       </label>
-      <label class="field"><span>Yksi luku on</span>
+      <label class="field"><span>A single number is</span>
         <select id="importSingle">
           <option value="carry">Carry</option>
-          <option value="total">Kokonaismatka</option>
+          <option value="total">Total</option>
         </select>
       </label>
     </div>
     <div class="row-2" style="margin-top:8px">
-      <label class="field"><span>Useasta lyönnistä</span>
+      <label class="field"><span>Several shots</span>
         <select id="importAgg">
-          <option value="median">Mediaani</option>
-          <option value="mean">Keskiarvo</option>
+          <option value="median">Median</option>
+          <option value="mean">Average</option>
         </select>
       </label>
     </div>
-    <label class="check"><input type="checkbox" id="importScale" checked> Skaalaa 3/4 ja puolikas samassa suhteessa</label>
+    <label class="check"><input type="checkbox" id="importScale" checked> Scale the other swings with Full</label>
     <div class="imp-list" id="importPreview"></div>
     <div class="foot" style="padding:12px 0 0">
-      <button class="act sig" id="importApply" type="button" disabled>Tuo bägiin</button>
-      <button class="act ghost" id="importClose" type="button">Sulje</button>
+      <button class="act sig" id="importApply" type="button" disabled>Save to bag</button>
+      <button class="act ghost" id="importClose" type="button">Close</button>
     </div>
-    <p class="hint" id="importHint">Map My Bagin luvut on normalisoitu merenpintaan. Pidä peruskorkeus 0 m, niin päivän korkeuskorjaus osuu kohdalleen.</p>
+    <p class="hint" id="importHint">Map My Bag numbers are normalized to sea level. Keep the baseline elevation at 0 so today’s elevation correction lands in the right place.</p>
   </section>
 
   <!-- Mailahaku -->
   <section class="panel">
-    <h2>Mikä maila?</h2>
+    <h2>Which club?</h2>
     <div class="row-2">
-      <label class="field"><span>Matka lippuun (m)</span><input type="number" id="findDist" inputmode="decimal" placeholder="137"></label>
-      <label class="field"><span>Peruste</span><select id="findType">
-        <option value="carry">Carry (vesi/bunkkeri yli)</option>
-        <option value="total">Kokonaismatka</option>
+      <label class="field"><span id="findLab">Distance to the pin (m)</span><input type="number" id="findDist" inputmode="decimal" placeholder="150"></label>
+      <label class="field"><span>Use</span><select id="findType">
+        <option value="carry">Carry (over water or a bunker)</option>
+        <option value="total">Total</option>
       </select></label>
     </div>
     <div class="find-res" id="findRes"></div>
@@ -318,18 +317,36 @@ textarea.import{
 
   <div class="saved" id="saved"></div>
   <p class="note">
-    Ilmanpaine ja lämpötila muuttavat ilman tiheyttä; laskenta käyttää standardi-ilmakehää ja kertoo tiheysmuutoksen kantamavaikutuskertoimella 0,65 (≈ +2 % / 300 m, ≈ +2 % / 10 °C). Rullaus pidetään metreissä vakiona, eli olosuhteet vaikuttavat vain carryyn.
-    Lukittu maila jää päivän kunnon kertoimen ulkopuolelle mutta saa silti sää- ja korkeuskorjauksen.
-    Epävarma maila näkyy taulukossa vaaleampana ja häviää mailahaussa varmalle vaihtoehdolle, jos ero on alle 2,5 m. Kaikki arvot tallentuvat laitteelle.
+    Pressure and temperature change air density. The correction uses the standard atmosphere and applies 65% of that density change to carry (about +2% per 300 m, about +2% per 10 °C). Rollout stays fixed, so conditions change carry only.
+    A locked club skips the day-form factor and still gets weather and elevation. An uncertain club is quieter in the list and loses a club search to a confident one within about 3 yards (2.5 m). Everything stays on this device.
   </p>
+  </div>
+
+  <section class="panel hidden" id="screenSettings">
+    <div class="set-top">
+      <button class="act ghost" id="settingsBack" type="button">Back</button>
+      <h2>Settings</h2>
+    </div>
+    <h2>Distance</h2>
+    <div class="seg" id="unitSeg" role="group" aria-label="Distance unit">
+      <button type="button" data-unit="m" aria-pressed="true">Meters</button>
+      <button type="button" data-unit="yd" aria-pressed="false">Yards</button>
+    </div>
+    <p class="hint">Carry, total, and the pin search use this unit. Yards also show temperature in °F and elevation in feet. The correction itself still runs in meters and °C.</p>
+    <h2 style="margin-top:18px">Swings</h2>
+    <div id="swingList"></div>
+    <button class="act ghost" id="addSwing" type="button">Add swing</button>
+    <p class="hint">Name them the way you hit: knockdown, punch, stock. Each swing is its own column. On the phone you see one at a time. A new swing starts as a copy of Full.</p>
+  </section>
 </div>
 
 <script>
-const K = 0.65;              // tiheysmuutoksen vaikutus kantamaan
-const SW = {full:'Täysi lyönti', three:'3/4 lyönti', half:'Puolikas lyönti'};
-const SWSHORT = {full:'täysi', three:'3/4', half:'½'};
-const UNC_PENALTY = 2.5;   // metriä: epävarman mailan sakko mailahaussa
-const STORE_KEY = 'mailakirja:v2';
+const K = 0.65;              // share of a density change that reaches carry
+const M_PER_YD = 0.9144;
+const M_PER_FT = 0.3048;
+const UNC_PENALTY = 2.5;   // meters: penalty for an uncertain club in search
+const STORE_KEY = 'clubbook:v3';
+const LEGACY_KEY = 'mailakirja:v2';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* Toimii sekä Clauden artifact-ympäristössä (window.storage) että
@@ -349,35 +366,76 @@ const store = {
   }
 };
 
-// [nimi, carry, total] — totalit Harrin bägistä, carry = total − arvioitu rullaus
+// [name, carry m, total m]
 const DEFAULT_BAG = [
-  ['Driver',203,225],['Puu 3',187,203],['Hybridi 5',178,191],
-  ['i4',161,172],['i5',152,161],['i6',146,154],['i7',134,141],['i8',131,137],['i9',119,124],
-  ['PW 41°',104,108],['48°',92,95],
-  // halpiswedget: lukittu kalibroinnilta ja merkitty epävarmaksi
-  ['SW 56°',80,82,true,true],['53°',72,74,true,true],['60°',61,63]
+  ['Driver',203,225],['3 Wood',187,203],['5 Hybrid',178,191],
+  ['4 Iron',161,172],['5 Iron',152,161],['6 Iron',146,154],['7 Iron',134,141],['8 Iron',131,137],['9 Iron',119,124],
+  ['PW',104,108],['48°',92,95],
+  ['SW',80,82,true,true],['53°',72,74,true,true],['60°',61,63]
 ];
+function defaultSwings(){
+  return [
+    {id:'full', name:'Full'},
+    {id:'three', name:'3/4'},
+    {id:'half', name:'Half'}
+  ];
+}
 
 let uidN = 0;
 const uid = () => 'c' + (++uidN) + Date.now().toString(36);
 
 function makeClub(name, c, t, lock, unc){
   const r = t - c;
-  return {
-    id: uid(), name, lock: !!lock, unc: !!unc,
-    full:  {c: c,                 t: t},
-    three: {c: Math.round(c*0.82), t: Math.round(c*0.82 + r*0.85)},
-    half:  {c: Math.round(c*0.58), t: Math.round(c*0.58 + r*0.70)}
+  const presets = {
+    full: {c: c, t: t},
+    three: {c: Math.round(c * 0.82), t: Math.round(c * 0.82 + r * 0.85)},
+    half: {c: Math.round(c * 0.58), t: Math.round(c * 0.58 + r * 0.70)}
   };
+  const shots = {};
+  state.swings.forEach(s => {
+    shots[s.id] = presets[s.id] ? {c: presets[s.id].c, t: presets[s.id].t} : {c: c, t: t};
+  });
+  return {id: uid(), name, lock: !!lock, unc: !!unc, shots};
 }
 
 let state = {
-  clubs: DEFAULT_BAG.map(d => makeClub(d[0], d[1], d[2], d[3], d[4])),
+  swings: defaultSwings(),
+  clubs: [],
   cond: {temp:15, alt:0, form:0},
   base: {temp:15, alt:0},
   swing: 'full',
-  edit: false
+  unit: 'm',
+  edit: false,
+  screen: 'bag'
 };
+state.clubs = DEFAULT_BAG.map(d => makeClub(d[0], d[1], d[2], d[3], d[4]));
+
+function swingById(id){ return state.swings.find(s => s.id === id) || state.swings[0]; }
+function stockId(){ return state.swings.some(s => s.id === 'full') ? 'full' : state.swings[0].id; }
+function shotOf(club, id){
+  if(!club.shots) club.shots = {};
+  if(!club.shots[id]){
+    const base = club.shots.full || {c:100, t:106};
+    club.shots[id] = {c: base.c, t: base.t};
+  }
+  return club.shots[id];
+}
+const yards = () => state.unit === 'yd';
+function tempOut(c){ return yards() ? c * 9 / 5 + 32 : c; }
+function tempIn(v){ const n = parseFloat(v); if(!Number.isFinite(n)) return 0; return yards() ? (n - 32) * 5 / 9 : n; }
+function altOut(m){ return yards() ? m / M_PER_FT : m; }
+function altIn(v){ const n = parseFloat(v); if(!Number.isFinite(n)) return 0; return yards() ? n * M_PER_FT : n; }
+function dispDist(meters){
+  if(meters == null || !Number.isFinite(meters)) return null;
+  return yards() ? Math.round(meters / M_PER_YD) : Math.round(meters);
+}
+function storeDist(shown){
+  const n = parseFloat(shown);
+  if(!Number.isFinite(n)) return 0;
+  return yards() ? n * M_PER_YD : n;
+}
+function unitLabel(){ return yards() ? 'yd' : 'm'; }
+function fmt1(n){ return (n >= 0 ? '+' : '') + n.toFixed(1) + '%'; }
 
 /* ---------- fysiikka ---------- */
 const pressureRatio = a => Math.pow(1 - 2.25577e-5 * a, 5.25588);
@@ -396,7 +454,7 @@ const totalFactor = () => envFactor() * formFactor();
 const factorFor = club => envFactor() * (club.lock ? 1 : formFactor());
 
 function adjusted(club, sw){
-  const b = club[sw];
+  const b = shotOf(club, sw);
   const roll = b.t - b.c;
   const c = b.c * factorFor(club);
   return {c: Math.round(c), t: Math.round(c + roll), bc: b.c, bt: b.t, f: factorFor(club)};
@@ -408,29 +466,45 @@ function save(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     const ok = await store.set(STORE_KEY, JSON.stringify({
-      clubs: state.clubs, cond: state.cond, base: state.base, swing: state.swing
+      clubs: state.clubs, swings: state.swings, unit: state.unit,
+      cond: state.cond, base: state.base, swing: state.swing
     }));
     stamp(ok
-      ? 'Tallennettu ' + new Date().toLocaleTimeString('fi-FI', {hour:'2-digit',minute:'2-digit'})
-      : 'Tallennus ei onnistunut — arvot säilyvät vain tämän istunnon ajan.');
+      ? 'Saved ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})
+      : 'Could not save. Numbers last for this visit only.');
   }, 400);
 }
 function stamp(t){ document.getElementById('saved').textContent = t; }
 
+function migrateClub(c){
+  c.lock = !!c.lock;
+  c.unc = !!c.unc;
+  if(!c.shots){
+    c.shots = {
+      full: c.full || {c:0, t:0},
+      three: c.three || {c:0, t:0},
+      half: c.half || {c:0, t:0}
+    };
+  }
+  delete c.full; delete c.three; delete c.half;
+  state.swings.forEach(s => { shotOf(c, s.id); });
+  return c;
+}
 async function load(){
   try{
-    const raw = await store.get(STORE_KEY);
-    if(raw){
-      const d = JSON.parse(raw);
-      if(d.clubs && d.clubs.length){
-        state.clubs = d.clubs.map(c => { c.lock = !!c.lock; c.unc = !!c.unc; return c; });
-      }
-      if(d.cond) state.cond = Object.assign(state.cond, d.cond);
-      if(d.base) state.base = Object.assign(state.base, d.base);
-      if(d.swing) state.swing = d.swing;
-      stamp('Aiemmat arvot ladattu.');
-    }
-  }catch(e){ /* ensimmäinen käynnistys */ }
+    let raw = await store.get(STORE_KEY);
+    if(!raw) raw = await store.get(LEGACY_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.swings && d.swings.length) state.swings = d.swings.map(s => ({id: String(s.id), name: String(s.name || 'Swing')}));
+    if(d.unit === 'yd' || d.unit === 'm') state.unit = d.unit;
+    if(d.clubs && d.clubs.length) state.clubs = d.clubs.map(migrateClub);
+    if(d.cond) state.cond = Object.assign(state.cond, d.cond);
+    if(d.base) state.base = Object.assign(state.base, d.base);
+    if(d.swing && state.swings.some(s => s.id === d.swing)) state.swing = d.swing;
+    else state.swing = state.swings[0].id;
+    stamp('Saved book loaded.');
+  }catch(e){ /* first launch */ }
 }
 
 /* ---------- renderöinti ---------- */
@@ -440,19 +514,26 @@ const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function renderHeader(){
   const f = totalFactor();
   const pct = (f - 1) * 100;
-  $('factorNum').textContent = (f*100).toFixed(1).replace('.', ',') + ' %';
+  $('factorNum').textContent = (f*100).toFixed(1) + '%';
   const clamped = Math.max(-15, Math.min(15, pct));
   const fill = $('meterFill');
   const half = 50;
   if(clamped >= 0){ fill.style.left = half + '%'; fill.style.width = (clamped/15*half) + '%'; }
   else { fill.style.left = (half + clamped/15*half) + '%'; fill.style.width = (-clamped/15*half) + '%'; }
-  $('swingLabel').textContent = SW[state.swing];
-  $('chipCondTxt').textContent = state.cond.temp + ' °C · ' + state.cond.alt + ' m';
+  $('swingLabel').textContent = swingById(state.swing).name;
+  const tShow = Math.round(tempOut(state.cond.temp));
+  const aShow = Math.round(altOut(state.cond.alt));
+  $('chipCondTxt').textContent = tShow + (yards() ? ' °F · ' : ' °C · ') + aShow + (yards() ? ' ft' : ' m');
   const ff = (formFactor()-1)*100;
-  $('chipCalTxt').textContent = Math.abs(ff) < 0.05 ? 'Kalibroi' : 'Kunto ' + (ff>0?'+':'−') + Math.abs(ff).toFixed(1).replace('.',',') + ' %';
-  $('tempVal').textContent = state.cond.temp + ' °C';
-  $('altVal').textContent = state.cond.alt + ' m';
-  $('formVal').textContent = (ff>=0?'+':'−') + Math.abs(ff).toFixed(1).replace('.',',') + ' %';
+  $('chipCalTxt').textContent = Math.abs(ff) < 0.05 ? 'Calibrate' : 'Form ' + fmt1(ff);
+  $('tempVal').textContent = tShow + (yards() ? ' °F' : ' °C');
+  $('altVal').textContent = aShow + (yards() ? ' ft' : ' m');
+  $('formVal').textContent = fmt1(ff);
+  $('baseTempLab').textContent = yards() ? 'Temperature °F' : 'Temperature °C';
+  $('baseAltLab').textContent = yards() ? 'Elevation ft' : 'Elevation m';
+  $('calHitLab').textContent = 'I hit (' + unitLabel() + ')';
+  $('findLab').textContent = 'Distance to the pin (' + unitLabel() + ')';
+  $('chipSettings').textContent = state.screen === 'settings' ? 'Done' : 'Settings';
 }
 
 function renderMatrix(){
@@ -460,7 +541,7 @@ function renderMatrix(){
   m.innerHTML = '';
   const head = document.createElement('div');
   head.className = 'mrow head-row';
-  head.innerHTML = '<div>Maila</div><div>Carry</div><div>Total</div>';
+  head.innerHTML = '<div>Club</div><div>Carry</div><div>Total</div>';
   m.appendChild(head);
 
   state.clubs.forEach((club, i) => {
@@ -468,28 +549,28 @@ function renderMatrix(){
     row.className = 'mrow';
     if(state.edit){
       row.style.gridTemplateColumns = '1fr 66px 66px 34px';
-      const b = club[state.swing];
+      const b = shotOf(club, state.swing);
       row.innerHTML =
         '<input class="cell name-in" type="text" value="'+esc(club.name)+'" data-i="'+i+'" data-f="name">' +
-        '<input class="cell" type="number" inputmode="numeric" value="'+b.c+'" data-i="'+i+'" data-f="c">' +
-        '<input class="cell" type="number" inputmode="numeric" value="'+b.t+'" data-i="'+i+'" data-f="t">' +
-        '<button class="del" data-del="'+i+'" aria-label="Poista maila">×</button>' +
+        '<input class="cell" type="number" inputmode="numeric" value="'+dispDist(b.c)+'" data-i="'+i+'" data-f="c">' +
+        '<input class="cell" type="number" inputmode="numeric" value="'+dispDist(b.t)+'" data-i="'+i+'" data-f="t">' +
+        '<button class="del" data-del="'+i+'" aria-label="Delete club">×</button>' +
         '<div class="flags">' +
-          '<button class="flag" data-tog="lock" data-i="'+i+'" aria-pressed="'+(club.lock?'true':'false')+'">Lukittu</button>' +
-          '<button class="flag unc" data-tog="unc" data-i="'+i+'" aria-pressed="'+(club.unc?'true':'false')+'">Epävarma</button>' +
+          '<button class="flag" data-tog="lock" data-i="'+i+'" aria-pressed="'+(club.lock?'true':'false')+'">Locked</button>' +
+          '<button class="flag unc" data-tog="unc" data-i="'+i+'" aria-pressed="'+(club.unc?'true':'false')+'">Uncertain</button>' +
         '</div>';
     }else{
       const a = adjusted(club, state.swing);
       const changed = Math.abs(a.f - 1) > 0.002;
       const tags = [];
-      if(club.lock) tags.push('lukittu');
-      if(club.unc)  tags.push('<span class="u">epävarma</span>');
+      if(club.lock) tags.push('locked');
+      if(club.unc)  tags.push('<span class="u">uncertain</span>');
       const soft = club.unc ? ' soft' : '';
       row.innerHTML =
         '<div><div class="club">'+esc(club.name)+'</div>' +
           (tags.length ? '<div class="tags">'+tags.join(' · ')+'</div>' : '') + '</div>' +
-        '<div class="num'+soft+'"><b>'+a.c+'</b>'+(changed?'<small>'+a.bc+'</small>':'')+'</div>' +
-        '<div class="num total'+soft+'"><b>'+a.t+'</b>'+(changed?'<small>'+a.bt+'</small>':'')+'</div>';
+        '<div class="num'+soft+'"><b>'+dispDist(a.c)+'</b>'+(changed?'<small>'+dispDist(a.bc)+'</small>':'')+'</div>' +
+        '<div class="num total'+soft+'"><b>'+dispDist(a.t)+'</b>'+(changed?'<small>'+dispDist(a.bt)+'</small>':'')+'</div>';
     }
     m.appendChild(row);
   });
@@ -501,34 +582,72 @@ function renderCalClubs(){
   const usable = state.clubs.filter(c => !c.lock);
   sel.innerHTML = usable.length
     ? usable.map(c => '<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')
-    : '<option value="">Ei kalibroitavia mailoja</option>';
+    : '<option value="">No club to calibrate</option>';
   if(usable.some(c => c.id === cur)) sel.value = cur;
 }
 
 function renderFinder(){
   const box = $('findRes');
-  const d = parseFloat($('findDist').value);
-  if(!d || d <= 0){ box.innerHTML = ''; return; }
+  const shown = parseFloat($('findDist').value);
+  if(!shown || shown <= 0){ box.innerHTML = ''; return; }
+  const d = storeDist(shown);
   const type = $('findType').value;
   const opts = [];
   state.clubs.forEach(c => {
-    ['full','three','half'].forEach(sw => {
-      const a = adjusted(c, sw);
+    state.swings.forEach(sw => {
+      const a = adjusted(c, sw.id);
       const v = type === 'carry' ? a.c : a.t;
-      // epävarma maila häviää yhtä lähellä olevalle varmalle
-      opts.push({name:c.name, sw, v, off: v - d, unc: c.unc, rank: Math.abs(v - d) + (c.unc ? UNC_PENALTY : 0)});
+      const off = dispDist(v) - Math.round(shown);
+      opts.push({name:c.name, sw: sw.name, v: dispDist(v), off, unc: c.unc, rank: Math.abs(v - d) + (c.unc ? UNC_PENALTY : 0)});
     });
   });
   opts.sort((x,y) => x.rank - y.rank);
   box.innerHTML = opts.slice(0,3).map((o,i) =>
     '<div class="find-item'+(i===0?' best':'')+'">' +
-      '<div><span class="fi-club">'+esc(o.name)+'</span><span class="fi-sw">'+SWSHORT[o.sw] +
-        (o.unc ? ' · epävarma' : '')+'</span></div>' +
-      '<div><span class="fi-d">'+o.v+' m</span><span class="fi-off">'+(o.off>=0?'+':'−')+Math.abs(o.off)+'</span></div>' +
+      '<div><span class="fi-club">'+esc(o.name)+'</span><span class="fi-sw">'+esc(o.sw) +
+        (o.unc ? ' · uncertain' : '')+'</span></div>' +
+      '<div><span class="fi-d">'+o.v+' '+unitLabel()+'</span><span class="fi-off">'+(o.off>=0?'+':'')+o.off+'</span></div>' +
     '</div>').join('');
 }
 
-function render(){ renderHeader(); renderMatrix(); renderFinder(); }
+function renderTabs(){
+  $('tabs').innerHTML = state.swings.map(s =>
+    '<button class="tab" type="button" role="tab" data-sw="'+s.id+'" aria-selected="'+(s.id===state.swing?'true':'false')+'">'+esc(s.name)+'</button>'
+  ).join('') + '<button class="tab add" type="button" id="tabAdd" aria-label="Add swing">+</button>';
+}
+function renderSwingSettings(){
+  $('swingList').innerHTML = state.swings.map(s =>
+    '<div class="swing-edit"><input type="text" value="'+esc(s.name)+'" data-swing="'+s.id+'" aria-label="Swing name">' +
+    '<button class="del" type="button" data-rmswing="'+s.id+'" aria-label="Delete swing"'+(state.swings.length<=1?' disabled':'')+'>×</button></div>'
+  ).join('');
+  document.querySelectorAll('#unitSeg button').forEach(b => {
+    b.setAttribute('aria-pressed', b.dataset.unit === state.unit ? 'true' : 'false');
+  });
+}
+function renderScreen(){
+  const settings = state.screen === 'settings';
+  $('screenSettings').classList.toggle('hidden', !settings);
+  $('bag').classList.toggle('hidden', settings);
+}
+function renderCalSwings(){
+  const sel = $('calSwing');
+  const cur = sel.value || state.swing;
+  sel.innerHTML = state.swings.map(s => '<option value="'+s.id+'">'+esc(s.name)+'</option>').join('');
+  if(state.swings.some(s => s.id === cur)) sel.value = cur;
+}
+function addSwing(){
+  const id = 's' + Date.now().toString(36);
+  state.swings.push({id, name: 'Swing ' + state.swings.length});
+  state.clubs.forEach(c => {
+    const base = shotOf(c, stockId());
+    c.shots[id] = {c: base.c, t: base.t};
+  });
+  state.swing = id;
+  render();
+  save();
+}
+
+function render(){ renderScreen(); renderHeader(); renderTabs(); renderCalSwings(); renderSwingSettings(); renderMatrix(); renderFinder(); }
 
 /* ---------- Trackman-tuonti ---------- */
 function splitRow(line, delim){
@@ -680,8 +799,8 @@ function parseTrackman(text, opts){
   if(!opts.unitTouched && (headerYards || rawMax > 320)){
     unit = 'yd';
     unitNote = headerYards
-      ? 'Yksiköksi valittiin jaardit otsikon perusteella.'
-      : 'Yksiköksi valittiin jaardit, koska suurin luku on yli 320.';
+      ? 'Read as yards because the header says so.'
+      : 'Read as yards because the largest number is over 320.';
   }
   const toM = v => v == null ? null : (unit === 'yd' ? v * 0.9144 : v);
   const groups = new Map();
@@ -703,7 +822,7 @@ function parseTrackman(text, opts){
   });
   return {
     clubs, unit, unitNote, skipped,
-    error: clubs.length ? null : 'Ei tunnistettuja mailoja. Yksi maila per rivi, esimerkiksi Driver 203 225.'
+    error: clubs.length ? null : 'No clubs recognized. One club per line, for example Driver 222 246.'
   };
 }
 
@@ -774,9 +893,10 @@ function matchClub(name, clubs){
 function resolveDistances(row, club){
   let carry = row.carry, total = row.total;
   if(club){
-    const roll = club.full.t - club.full.c;
+    const stock = shotOf(club, stockId());
+    const roll = stock.t - stock.c;
     if(carry == null) carry = Math.max(1, Math.round(total - roll));
-    if(total == null) total = Math.round(carry + Math.max(0, roll));
+    if(total == null) total = Math.round(carry + roll);
   }else{
     if(carry == null){
       const roll = estimateRoll(total);
@@ -787,20 +907,26 @@ function resolveDistances(row, club){
   return {carry, total};
 }
 function scalePartials(club, carry, total){
-  const oldC = club.full.c;
-  const oldRoll = club.full.t - club.full.c;
-  const ratios = ['three', 'half'].map(sw => ({
-    sw,
-    cRatio: oldC > 0 ? club[sw].c / oldC : (sw === 'three' ? 0.82 : 0.58),
-    rRatio: oldRoll !== 0 ? (club[sw].t - club[sw].c) / oldRoll : (sw === 'three' ? 0.85 : 0.70)
-  }));
-  club.full.c = carry;
-  club.full.t = total;
+  const old = shotOf(club, stockId());
+  const oldC = old.c;
+  const oldRoll = old.t - old.c;
+  const anchor = stockId();
+  const ratios = state.swings.filter(s => s.id !== anchor).map(s => {
+    const b = shotOf(club, s.id);
+    return {
+      id: s.id,
+      cRatio: oldC > 0 ? b.c / oldC : 1,
+      rRatio: oldRoll !== 0 ? (b.t - b.c) / oldRoll : 1
+    };
+  });
+  old.c = carry;
+  old.t = total;
   const newRoll = total - carry;
   ratios.forEach(p => {
+    const b = shotOf(club, p.id);
     const c = Math.round(carry * p.cRatio);
-    club[p.sw].c = c;
-    club[p.sw].t = c + Math.round(newRoll * p.rRatio);
+    b.c = c;
+    b.t = c + Math.round(newRoll * p.rRatio);
   });
 }
 
@@ -816,30 +942,29 @@ function importOptions(){
 }
 function refreshImport(){
   const parsed = parseTrackman($('importText').value, importOptions());
-  importParsed = parsed;
   if(parsed.unit !== $('importUnit').value) $('importUnit').value = parsed.unit;
   const box = $('importPreview');
   box.innerHTML = parsed.clubs.map(row => {
     const hit = matchClub(row.name, state.clubs);
-    const dest = hit.club ? ' <span class="arrow">→ ' + esc(hit.club.name) + '</span>' : (hit.ambiguous ? ' <span class="arrow">uusi, nimi täsmää useaan</span>' : ' <span class="arrow">uusi</span>');
+    const dest = hit.club ? ' <span class="arrow">→ ' + esc(hit.club.name) + '</span>' : (hit.ambiguous ? ' <span class="arrow">new, name matches more than one</span>' : ' <span class="arrow">new</span>');
     const d = resolveDistances(row, hit.club);
-    const bits = ['c ' + d.carry, 't ' + d.total];
-    if(hit.club && (row.carry == null || row.total == null)) bits.push('rullaus ennallaan');
-    else if(!hit.club && (row.carry == null || row.total == null)) bits.push('rullaus arvio');
-    bits.push(row.fromAvg ? 'keskiarvo' : (row.n === 1 ? '1 lyönti' : row.n + ' lyöntiä'));
+    const bits = ['c ' + dispDist(d.carry), 't ' + dispDist(d.total)];
+    if(hit.club && (row.carry == null || row.total == null)) bits.push('rollout kept');
+    else if(!hit.club && (row.carry == null || row.total == null)) bits.push('rollout estimated');
+    bits.push(row.fromAvg ? 'average row' : (row.n === 1 ? '1 shot' : row.n + ' shots'));
     return '<div class="imp-row"><div class="who">' + esc(row.name) + dest + '</div><div class="meta">' + bits.join(' · ') + '</div></div>';
   }).join('');
   $('importApply').disabled = parsed.clubs.length === 0;
   const notes = [];
   if($('importText').value.trim() && parsed.error) notes.push(parsed.error);
   if(parsed.unitNote) notes.push(parsed.unitNote);
-  if(parsed.skipped) notes.push(parsed.skipped + (parsed.skipped === 1 ? ' rivi ohitettiin.' : ' riviä ohitettiin.'));
-  if(!notes.length) notes.push('Map My Bagin luvut on normalisoitu merenpintaan. Pidä peruskorkeus 0 m, niin päivän korkeuskorjaus osuu kohdalleen.');
+  if(parsed.skipped) notes.push(parsed.skipped + (parsed.skipped === 1 ? ' row skipped.' : ' rows skipped.'));
+  if(!notes.length) notes.push('Map My Bag numbers are normalized to sea level. Keep the baseline elevation at 0 so today’s elevation correction lands in the right place.');
   $('importHint').textContent = notes.join(' ');
 }
 function setImportOpen(open){
   $('panelImport').classList.toggle('hidden', !open);
-  $('importBtn').textContent = open ? 'Sulje tuonti' : 'Tuo Trackman';
+  $('importBtn').textContent = open ? 'Close import' : 'Import Trackman';
   $('importBtn').classList.toggle('sig', open);
   $('importBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
   if(open){
@@ -859,7 +984,7 @@ function applyImport(){
     const d = resolveDistances(row, club);
     if(club){
       if(scale) scalePartials(club, d.carry, d.total);
-      else { club.full.c = d.carry; club.full.t = d.total; }
+      else { const stock = shotOf(club, stockId()); stock.c = d.carry; stock.t = d.total; }
       updated++;
     }else{
       state.clubs.push(makeClub(row.name, d.carry, d.total));
@@ -870,37 +995,83 @@ function applyImport(){
   render();
   save();
   const parts = [];
-  if(updated) parts.push(updated + ' päivitetty');
-  if(added) parts.push(added + ' lisätty');
-  $('importHint').textContent = 'Tuotu bägiin: ' + parts.join(', ') + '.';
+  if(updated) parts.push(updated + ' updated');
+  if(added) parts.push(added + ' added');
   refreshImport();
-  $('importHint').textContent = 'Tuotu bägiin: ' + parts.join(', ') + '.';
+  $('importHint').textContent = 'Saved to the bag: ' + parts.join(', ') + '.';
 }
 
 /* ---------- tapahtumat ---------- */
-$('chipCond').onclick = () => { $('panelCond').classList.toggle('hidden'); $('panelCal').classList.add('hidden'); };
-$('chipCal').onclick  = () => { $('panelCal').classList.toggle('hidden'); $('panelCond').classList.add('hidden'); renderCalClubs(); };
-
-['temp','alt','form'].forEach(id => {
-  $(id).oninput = e => {
-    state.cond[id === 'temp' ? 'temp' : id === 'alt' ? 'alt' : 'form'] = parseFloat(e.target.value);
-    render(); save();
-  };
+$('chipCond').onclick = () => {
+  state.screen = 'bag';
+  $('panelCond').classList.toggle('hidden');
+  $('panelCal').classList.add('hidden');
+  renderScreen();
+};
+$('chipCal').onclick  = () => {
+  state.screen = 'bag';
+  $('panelCal').classList.toggle('hidden');
+  $('panelCond').classList.add('hidden');
+  renderScreen();
+  renderCalClubs();
+  renderCalSwings();
+};
+$('chipSettings').onclick = () => {
+  state.screen = state.screen === 'settings' ? 'bag' : 'settings';
+  $('panelCond').classList.add('hidden');
+  $('panelCal').classList.add('hidden');
+  if(state.screen === 'settings') setImportOpen(false);
+  render();
+};
+$('settingsBack').onclick = () => { state.screen = 'bag'; render(); };
+$('unitSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-unit]');
+  if(!b) return;
+  state.unit = b.dataset.unit;
+  if(!importUnitTouched) $('importUnit').value = state.unit;
+  syncInputs();
+  render();
+  save();
 });
-$('baseTemp').oninput = e => { state.base.temp = parseFloat(e.target.value)||0; render(); save(); };
-$('baseAlt').oninput  = e => { state.base.alt  = parseFloat(e.target.value)||0; render(); save(); };
+$('addSwing').onclick = addSwing;
+$('swingList').addEventListener('input', e => {
+  const id = e.target.dataset.swing;
+  if(!id) return;
+  const s = state.swings.find(x => x.id === id);
+  if(!s) return;
+  s.name = e.target.value;
+  renderTabs();
+  renderCalSwings();
+  $('swingLabel').textContent = swingById(state.swing).name;
+  save();
+});
+$('swingList').addEventListener('click', e => {
+  const id = e.target.dataset.rmswing;
+  if(!id || state.swings.length <= 1) return;
+  state.swings = state.swings.filter(s => s.id !== id);
+  if(state.swing === id) state.swing = state.swings[0].id;
+  render();
+  save();
+});
+
+$('temp').oninput = e => { state.cond.temp = tempIn(e.target.value); render(); save(); };
+$('alt').oninput = e => { state.cond.alt = altIn(e.target.value); render(); save(); };
+$('form').oninput = e => { state.cond.form = parseFloat(e.target.value); render(); save(); };
+$('baseTemp').oninput = e => { state.base.temp = tempIn(e.target.value); render(); save(); };
+$('baseAlt').oninput  = e => { state.base.alt  = altIn(e.target.value); render(); save(); };
 
 $('resetDay').onclick = () => {
   state.cond = {temp: state.base.temp, alt: state.base.alt, form: 0};
   syncInputs(); render(); save();
 };
 
-document.querySelectorAll('.tab').forEach(t => {
-  t.onclick = () => {
-    state.swing = t.dataset.sw;
-    document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
-    render(); save();
-  };
+$('tabs').addEventListener('click', e => {
+  if(e.target.closest('#tabAdd')){ addSwing(); return; }
+  const t = e.target.closest('.tab');
+  if(!t || !t.dataset.sw) return;
+  state.swing = t.dataset.sw;
+  render();
+  save();
 });
 
 $('importBtn').onclick = () => setImportOpen($('panelImport').classList.contains('hidden'));
@@ -917,11 +1088,11 @@ $('importFile').onchange = e => {
 $('importPaste').onclick = async () => {
   try{
     const t = await navigator.clipboard.readText();
-    if(!t){ $('importHint').textContent = 'Leikepöytä on tyhjä.'; return; }
+    if(!t){ $('importHint').textContent = 'Clipboard is empty.'; return; }
     $('importText').value = t;
     refreshImport();
   }catch(err){
-    $('importHint').textContent = 'Liittäminen leikepöydältä ei onnistunut. Liitä teksti kenttään käsin.';
+    $('importHint').textContent = 'Clipboard paste was blocked. Paste into the box yourself.';
   }
 };
 $('importText').addEventListener('input', refreshImport);
@@ -932,19 +1103,19 @@ $('importApply').onclick = applyImport;
 
 $('editBtn').onclick = () => {
   state.edit = !state.edit;
-  $('editBtn').textContent = state.edit ? 'Valmis' : 'Muokkaa perusarvoja';
+  $('editBtn').textContent = state.edit ? 'Done' : 'Edit stock distances';
   $('editBtn').classList.toggle('sig', state.edit);
   $('addBtn').classList.toggle('hidden', !state.edit);
   render();
 };
-$('addBtn').onclick = () => { state.clubs.push(makeClub('Uusi maila', 100, 106)); renderCalClubs(); render(); save(); };
+$('addBtn').onclick = () => { state.clubs.push(makeClub('New club', 100, 106)); renderCalClubs(); render(); save(); };
 
 $('matrix').addEventListener('input', e => {
   const el = e.target;
   if(!el.dataset.f) return;
   const c = state.clubs[+el.dataset.i];
   if(el.dataset.f === 'name'){ c.name = el.value; renderCalClubs(); }
-  else { c[state.swing][el.dataset.f] = parseFloat(el.value) || 0; }
+  else { shotOf(c, state.swing)[el.dataset.f] = storeDist(el.value); }
   renderHeader(); renderFinder(); save();
 });
 $('matrix').addEventListener('click', e => {
@@ -964,12 +1135,12 @@ $('matrix').addEventListener('click', e => {
 });
 
 $('calApply').onclick = () => {
-  const hit = parseFloat($('calHit').value);
+  const hit = storeDist($('calHit').value);
   const club = state.clubs.find(c => c.id === $('calClub').value);
-  if(!hit || !club){ $('calHint').textContent = 'Valitse maila ja syötä lyöty matka.'; return; }
-  if(club.lock){ $('calHint').textContent = club.name + ' on lukittu, eikä kelpaa referenssiksi.'; return; }
+  if(!hit || !club){ $('calHint').textContent = 'Choose a club and enter the distance you hit.'; return; }
+  if(club.lock){ $('calHint').textContent = club.name + ' is locked, so it can’t be the reference.'; return; }
   const sw = $('calSwing').value;
-  const b = club[sw];
+  const b = shotOf(club, sw);
   const roll = b.t - b.c;
   const measuredCarry = $('calType').value === 'total' ? hit - roll : hit;
   const expectedCarry = b.c * envFactor();
@@ -978,24 +1149,32 @@ $('calApply').onclick = () => {
   pct = Math.max(-15, Math.min(15, Math.round(pct * 2) / 2));
   state.cond.form = pct;
   syncInputs(); render(); save();
-  $('calHint').textContent = club.name + ' ' + SWSHORT[sw] + ': ' + hit + ' m → päivän kunto ' +
-    (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(1).replace('.',',') + ' %. Skaalattu kaikkiin paitsi lukittuihin mailoihin.';
+  const swName = swingById(sw).name;
+  $('calHint').textContent = club.name + ' ' + swName + ': ' + dispDist(hit) + ' ' + unitLabel() + ' → form ' +
+    fmt1(pct) + '. Scaled every club except the locked ones.';
 };
 $('calClear').onclick = () => {
   state.cond.form = 0; syncInputs(); render(); save();
-  $('calHint').textContent = 'Kalibrointi poistettu, taulukossa perusarvot olosuhteilla korjattuna.';
+  $('calHint').textContent = 'Calibration cleared. The book is back to stock distances, still corrected for the weather.';
 };
 
 $('findDist').oninput = renderFinder;
 $('findType').onchange = renderFinder;
 
 function syncInputs(){
-  $('temp').value = state.cond.temp;
-  $('alt').value = state.cond.alt;
+  const temp = $('temp');
+  temp.min = yards() ? 14 : -10;
+  temp.max = yards() ? 104 : 40;
+  temp.step = 1;
+  temp.value = Math.round(tempOut(state.cond.temp));
+  const alt = $('alt');
+  alt.min = 0;
+  alt.max = yards() ? 8000 : 2500;
+  alt.step = yards() ? 50 : 25;
+  alt.value = Math.round(altOut(state.cond.alt));
   $('form').value = state.cond.form;
-  $('baseTemp').value = state.base.temp;
-  $('baseAlt').value = state.base.alt;
-  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.sw === state.swing));
+  $('baseTemp').value = Math.round(tempOut(state.base.temp));
+  $('baseAlt').value = Math.round(altOut(state.base.alt));
 }
 
 /* ---------- käynnistys ---------- */

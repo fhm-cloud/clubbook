@@ -1,7 +1,7 @@
 {
-  "name": "Mailakirja",
-  "short_name": "Mailakirja",
-  "description": "Golfmailojen carry- ja kokonaismatkat olosuhdekorjattuna.",
+  "name": "Clubbook",
+  "short_name": "Clubbook",
+  "description": "Carry and total for every club, adjusted for the day.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
